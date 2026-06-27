@@ -283,15 +283,12 @@ function SpriteCharacterIcon({
   paused: boolean;
 }) {
   const src = state === "needs_you" ? character.needsYouSrc : character.idleSrc;
-  const frames = state === "needs_you" ? character.needsYouFrames : character.idleFrames;
-
   return (
     <span
       className={`character-icon sprite-icon sprite-${state} ${paused ? "animations-paused" : ""}`}
       style={
         {
           "--sprite-url": `url(${src})`,
-          "--sprite-frames": frames,
         } as React.CSSProperties
       }
       aria-hidden="true"

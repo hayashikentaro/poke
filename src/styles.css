@@ -149,25 +149,31 @@ input {
   background-image: var(--sprite-url);
   background-position: 0 0;
   background-repeat: no-repeat;
-  animation-name: sprite-steps;
-  animation-timing-function: steps(var(--sprite-frames));
-  animation-iteration-count: infinite;
 }
 
 .sprite-not_now {
-  animation-duration: 1.091s;
+  animation: sprite-not-now 1.091s steps(6) infinite;
 }
 
 .sprite-needs_you {
-  animation-duration: 1s;
+  animation: sprite-needs-you 1s steps(8) infinite;
 }
 
-@keyframes sprite-steps {
+@keyframes sprite-not-now {
   from {
     background-position: 0 0;
   }
   to {
-    background-position: calc(var(--sprite-frames) * -16px) 0;
+    background-position: -96px 0;
+  }
+}
+
+@keyframes sprite-needs-you {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -128px 0;
   }
 }
 
