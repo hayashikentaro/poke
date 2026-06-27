@@ -1,7 +1,14 @@
+@font-face {
+  font-family: "Poke Misaki Gothic";
+  src: url("/fonts/misaki/misaki_gothic.ttf") format("truetype");
+  font-display: swap;
+}
+
 :root {
   color: #d3ddcf;
   background: #101410;
   font-family:
+    "Poke Misaki Gothic",
     "Misaki Gothic",
     "MisakiGothic",
     "美咲ゴシック",
