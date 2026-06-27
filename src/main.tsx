@@ -29,9 +29,9 @@ function spriteCharacter(id: string, name: string): Character {
   return {
     id,
     name,
-    iconSrc: `${basePath}/icon_16x16.png`,
-    idleSrc: `${basePath}/idle_16x16_6f.png`,
-    needsYouSrc: `${basePath}/needs_you_16x16_8f.png`,
+    iconSrc: `${basePath}/icon_32x32.png`,
+    idleSrc: `${basePath}/idle_32x32_6f.png`,
+    needsYouSrc: `${basePath}/needs_you_32x32_8f.png`,
     idleFrames: 6,
     needsYouFrames: 8,
   };
@@ -84,7 +84,7 @@ const mockTerminalText: Record<TabSession["mockKind"], string[]> = {
     "",
     "src/main.tsx                  41.7 kB",
     "src/styles.css                 8.4 kB",
-    "public/skins/default-poke-crew  24 sprites",
+    "public/skins/default-poke-crew  24 sprites, 32px frames",
     "",
     "✓ typecheck complete",
     "✓ assets copied",

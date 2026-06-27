@@ -110,11 +110,6 @@ input {
   outline-offset: 2px;
 }
 
-.tab-icon-button .character-icon {
-  transform: scale(2);
-  transform-origin: center;
-}
-
 .tab-name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -151,12 +146,12 @@ input {
   white-space: pre-wrap;
 }
 
-/* Source frames stay 16x16; tab icons are visually doubled by the tab chrome. */
+/* Source frames are 32x32; no CSS scaling is applied to character sprites. */
 .character-icon {
-  width: 16px;
-  height: 16px;
+  width: 32px;
+  height: 32px;
   display: inline-block;
-  flex: 0 0 16px;
+  flex: 0 0 32px;
   overflow: hidden;
   image-rendering: pixelated;
 }
@@ -181,7 +176,7 @@ input {
     background-position: 0 0;
   }
   to {
-    background-position: -96px 0;
+    background-position: -192px 0;
   }
 }
 
@@ -190,7 +185,7 @@ input {
     background-position: 0 0;
   }
   to {
-    background-position: -128px 0;
+    background-position: -256px 0;
   }
 }
 
@@ -236,9 +231,9 @@ input {
 
 .picker-row {
   width: 100%;
-  height: 28px;
+  height: 38px;
   display: grid;
-  grid-template-columns: 16px 22px 16px minmax(0, 1fr) 46px;
+  grid-template-columns: 16px 22px 32px minmax(0, 1fr) 46px;
   align-items: center;
   gap: 8px;
   padding: 0 8px;
