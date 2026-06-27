@@ -1,7 +1,18 @@
 :root {
   color: #d3ddcf;
   background: #101410;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-family:
+    "Misaki Gothic",
+    "MisakiGothic",
+    "美咲ゴシック",
+    "美咲フォント",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -128,6 +139,7 @@ input {
 .terminal-body pre {
   margin: 0;
   color: #c8d6c3;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: 14px;
   line-height: 1.58;
   letter-spacing: 0;
