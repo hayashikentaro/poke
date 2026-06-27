@@ -144,12 +144,11 @@ input {
   image-rendering: pixelated;
 }
 
-/* Mugi uses the supplied real sprite-sheet assets. */
+/* Characters use the default skin pack sprite-sheet assets. */
 .sprite-icon {
   background-image: var(--sprite-url);
   background-position: 0 0;
   background-repeat: no-repeat;
-  filter: invert(1) hue-rotate(180deg);
   animation-name: sprite-steps;
   animation-timing-function: steps(var(--sprite-frames));
   animation-iteration-count: infinite;
@@ -172,56 +171,8 @@ input {
   }
 }
 
-/* Placeholder characters are deliberately minimal until more sprite assets exist. */
-.placeholder-icon {
-  position: relative;
-  border: 1px solid rgba(214, 230, 206, 0.24);
-  background:
-    linear-gradient(90deg, transparent 0 3px, var(--placeholder-b) 3px 13px, transparent 13px),
-    linear-gradient(180deg, var(--placeholder-a) 0 5px, var(--placeholder-b) 5px 13px, transparent 13px),
-    transparent;
-}
-
-.placeholder-icon::before,
-.placeholder-icon::after {
-  content: "";
-  position: absolute;
-  top: 6px;
-  width: 2px;
-  height: 2px;
-  background: #e6eedf;
-}
-
-.placeholder-icon::before {
-  left: 5px;
-}
-
-.placeholder-icon::after {
-  right: 5px;
-}
-
-.placeholder-not_now {
-  animation: placeholder-idle 1.3s steps(2, end) infinite;
-}
-
-.placeholder-needs_you {
-  animation: placeholder-poke 0.55s steps(2, end) infinite;
-}
-
 .animations-paused {
   animation-play-state: paused;
-}
-
-@keyframes placeholder-idle {
-  50% {
-    transform: translateY(1px);
-  }
-}
-
-@keyframes placeholder-poke {
-  50% {
-    transform: translateX(1px);
-  }
 }
 
 .picker-layer {

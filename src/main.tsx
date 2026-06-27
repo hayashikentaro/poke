@@ -4,23 +4,15 @@ import "./styles.css";
 
 type AttentionState = "not_now" | "needs_you";
 
-type Character =
-  | {
-      id: string;
-      name: string;
-      kind: "mugi";
-      iconSrc: string;
-      idleSrc: string;
-      needsYouSrc: string;
-      idleFrames: number;
-      needsYouFrames: number;
-    }
-  | {
-      id: string;
-      name: string;
-      kind: "placeholder";
-      colors: [string, string];
-    };
+type Character = {
+  id: string;
+  name: string;
+  iconSrc: string;
+  idleSrc: string;
+  needsYouSrc: string;
+  idleFrames: number;
+  needsYouFrames: number;
+};
 
 type TabSession = {
   id: string;
@@ -29,29 +21,36 @@ type TabSession = {
   mockKind: "dev" | "logs" | "build" | "shell";
 };
 
-const characters: Character[] = [
-  {
-    id: "mugi",
-    name: "Mugi",
-    kind: "mugi",
-    iconSrc: "/sprites/mugi_icon_16x16.png",
-    idleSrc: "/sprites/mugi_idle_16x16_6f.png",
-    needsYouSrc: "/sprites/mugi_needs_you_16x16_8f.png",
+const skinBasePath = "/skins/default-poke-crew/characters";
+
+function spriteCharacter(id: string, name: string): Character {
+  const basePath = `${skinBasePath}/${id}`;
+
+  return {
+    id,
+    name,
+    iconSrc: `${basePath}/icon_16x16.png`,
+    idleSrc: `${basePath}/idle_16x16_6f.png`,
+    needsYouSrc: `${basePath}/needs_you_16x16_8f.png`,
     idleFrames: 6,
     needsYouFrames: 8,
-  },
-  { id: "nori", name: "Nori", kind: "placeholder", colors: ["#78a88b", "#20372c"] },
-  { id: "kiku", name: "Kiku", kind: "placeholder", colors: ["#b0a36b", "#3a3422"] },
-  { id: "sora", name: "Sora", kind: "placeholder", colors: ["#779fb8", "#22323a"] },
-  { id: "rune", name: "Rune", kind: "placeholder", colors: ["#9c86b8", "#31283d"] },
-  { id: "tama", name: "Tama", kind: "placeholder", colors: ["#ba8d72", "#3f2b22"] },
-  { id: "io", name: "Io", kind: "placeholder", colors: ["#88b0aa", "#1f3938"] },
-  { id: "pico", name: "Pico", kind: "placeholder", colors: ["#b88b9b", "#3c2830"] },
+  };
+}
+
+const characters: Character[] = [
+  spriteCharacter("mugi", "Mugi"),
+  spriteCharacter("rune", "Rune"),
+  spriteCharacter("kiku", "Kiku"),
+  spriteCharacter("sora", "Sora"),
+  spriteCharacter("nagi", "Nagi"),
+  spriteCharacter("yuzu", "Yuzu"),
+  spriteCharacter("haru", "Haru"),
+  spriteCharacter("kiri", "Kiri"),
 ];
 
 const initialTabs: TabSession[] = [
   { id: "tab-1", characterId: "mugi", state: "not_now", mockKind: "dev" },
-  { id: "tab-2", characterId: "nori", state: "needs_you", mockKind: "logs" },
+  { id: "tab-2", characterId: "rune", state: "needs_you", mockKind: "logs" },
   { id: "tab-3", characterId: "kiku", state: "not_now", mockKind: "build" },
   { id: "tab-4", characterId: "sora", state: "not_now", mockKind: "shell" },
 ];
@@ -85,7 +84,7 @@ const mockTerminalText: Record<TabSession["mockKind"], string[]> = {
     "",
     "src/main.tsx                  41.7 kB",
     "src/styles.css                 8.4 kB",
-    "public/sprites/mugi_idle.png   306 B",
+    "public/skins/default-poke-crew  24 sprites",
     "",
     "✓ typecheck complete",
     "✓ assets copied",
@@ -271,24 +270,7 @@ function CharacterIcon({
   state: AttentionState;
   paused: boolean;
 }) {
-  if (character.kind === "mugi") {
-    return <SpriteCharacterIcon character={character} state={state} paused={paused} />;
-  }
-
-  return (
-    <span
-      className={`character-icon placeholder-icon placeholder-${state} ${
-        paused ? "animations-paused" : ""
-      }`}
-      style={
-        {
-          "--placeholder-a": character.colors[0],
-          "--placeholder-b": character.colors[1],
-        } as React.CSSProperties
-      }
-      aria-hidden="true"
-    />
-  );
+  return <SpriteCharacterIcon character={character} state={state} paused={paused} />;
 }
 
 function SpriteCharacterIcon({
@@ -296,7 +278,7 @@ function SpriteCharacterIcon({
   state,
   paused,
 }: {
-  character: Extract<Character, { kind: "mugi" }>;
+  character: Character;
   state: AttentionState;
   paused: boolean;
 }) {
