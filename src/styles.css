@@ -44,7 +44,7 @@ input {
 }
 
 .tab-bar {
-  min-height: 42px;
+  min-height: 58px;
   display: flex;
   align-items: end;
   gap: 2px;
@@ -54,9 +54,9 @@ input {
 }
 
 .tab {
-  height: 35px;
-  min-width: 98px;
-  max-width: 150px;
+  height: 51px;
+  min-width: 124px;
+  max-width: 176px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -81,10 +81,10 @@ input {
 }
 
 .tab-icon-button {
-  width: 16px;
-  height: 16px;
+  width: 32px;
+  height: 32px;
   display: inline-grid;
-  flex: 0 0 16px;
+  flex: 0 0 32px;
   place-items: center;
   cursor: pointer;
 }
@@ -92,6 +92,11 @@ input {
 .tab-icon-button:focus-visible {
   outline: 1px solid #b8c7aa;
   outline-offset: 2px;
+}
+
+.tab-icon-button .character-icon {
+  transform: scale(2);
+  transform-origin: center;
 }
 
 .tab-name {
@@ -129,7 +134,7 @@ input {
   white-space: pre-wrap;
 }
 
-/* Fixed intentionally: the prototype is validating 16x16 tab characters only. */
+/* Source frames stay 16x16; tab icons are visually doubled by the tab chrome. */
 .character-icon {
   width: 16px;
   height: 16px;
