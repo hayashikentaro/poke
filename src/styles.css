@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "Poke Misaki Gothic";
-  src: url("/fonts/misaki/misaki_gothic.ttf") format("truetype");
+  font-family: "Poke DotGothic16";
+  src: url("/fonts/dotgothic16/DotGothic16-Regular.ttf") format("truetype");
   font-display: swap;
 }
 
@@ -8,11 +8,8 @@
   color: #d3ddcf;
   background: #101410;
   font-family:
-    "Poke Misaki Gothic",
-    "Misaki Gothic",
-    "MisakiGothic",
-    "美咲ゴシック",
-    "美咲フォント",
+    "Poke DotGothic16",
+    "DotGothic16",
     ui-monospace,
     SFMono-Regular,
     Menlo,
