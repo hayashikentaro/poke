@@ -109,6 +109,10 @@ body {
   background: var(--tab-active-bg, var(--poke-active-tab-bg));
 }
 
+.tab-item[data-dragging="true"] {
+  opacity: 0.68;
+}
+
 .tab-button,
 .tab-character-button,
 .tab-close,

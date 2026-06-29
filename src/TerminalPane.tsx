@@ -262,6 +262,7 @@ export function TerminalPane() {
   const [sessions, setSessions] = useState<TerminalSession[]>([initialSession]);
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
+  const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
 
@@ -449,6 +450,26 @@ export function TerminalPane() {
     setPickerSessionId(null);
   }, []);
 
+  const moveSession = useCallback((sessionId: string, targetSessionId: string) => {
+    if (sessionId === targetSessionId) {
+      return;
+    }
+
+    setSessions((currentSessions) => {
+      const fromIndex = currentSessions.findIndex((session) => session.id === sessionId);
+      const toIndex = currentSessions.findIndex((session) => session.id === targetSessionId);
+
+      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) {
+        return currentSessions;
+      }
+
+      const nextSessions = [...currentSessions];
+      const [movedSession] = nextSessions.splice(fromIndex, 1);
+      nextSessions.splice(toIndex, 0, movedSession);
+      return nextSessions;
+    });
+  }, []);
+
   const pickerSession = sessions.find((session) => session.id === pickerSessionId) ?? null;
 
   return (
@@ -464,6 +485,20 @@ export function TerminalPane() {
               key={session.id}
               className="tab-item"
               data-active={isActive ? "true" : "false"}
+              data-dragging={draggingSessionId === session.id ? "true" : "false"}
+              onDragOver={(event) => {
+                if (!draggingSessionId) {
+                  return;
+                }
+
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                moveSession(draggingSessionId, session.id);
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDraggingSessionId(null);
+              }}
               style={
                 {
                   "--tab-bg": tabTheme.tabBackground,
@@ -494,6 +529,14 @@ export function TerminalPane() {
                 role="tab"
                 aria-selected={isActive}
                 className="tab-button"
+                draggable
+                onDragStart={(event) => {
+                  setPickerSessionId(null);
+                  setDraggingSessionId(session.id);
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", session.id);
+                }}
+                onDragEnd={() => setDraggingSessionId(null)}
                 onClick={() => activateSession(session.id)}
               >
                 <span className="tab-name">{character.name}</span>
