@@ -4,12 +4,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Commit Mono";
-  src: url("/fonts/commit-mono/CommitMono-Regular.woff2") format("woff2");
-  font-display: swap;
-}
-
 :root {
   --poke-app-bg: #15170f;
   --poke-panel-bg: #1d2013;

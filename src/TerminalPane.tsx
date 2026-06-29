@@ -88,7 +88,7 @@ function createTerminal(config: AppConfig) {
   return new Terminal({
     cursorBlink: true,
     fontFamily:
-      '"Commit Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+      'SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
     fontSize: config.terminal.fontSize,
     lineHeight: 1.2,
     theme: getCharacterTheme(characters[0].id).theme.xterm
