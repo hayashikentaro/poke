@@ -16,12 +16,9 @@ export type CharacterId =
   | "sena"
   | "towa"
   | "riko"
-  | "sumi"
   | "luka"
   | "nina"
   | "tomo"
-  | "yori"
-  | "runa"
   | "kana";
 
 export type PokeXtermTheme = {
@@ -674,52 +671,6 @@ export const pokeCharacterThemes = {
       }
     }
   },
-  "sumi": {
-    "id": "sumi",
-    "name": "Sumi",
-    "primary": "#C599F5",
-    "theme": {
-      "xterm": {
-        "background": "#19151E",
-        "foreground": "#E5E0EB",
-        "cursor": "#C599F5",
-        "cursorAccent": "#19151E",
-        "selectionBackground": "#372749",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#E5E0EB",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#19151E",
-        "panelBackground": "#211D26",
-        "tabBackground": "#2B2334",
-        "activeTabBackground": "#231D2A",
-        "activeTabBorder": "#C599F5",
-        "tabHoverBackground": "#372749",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#211D26",
-        "overlayBorder": "#C599F5",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#C599F5",
-        "scrollbarThumb": "#372749"
-      }
-    }
-  },
   "luka": {
     "id": "luka",
     "name": "Luka",
@@ -855,98 +806,6 @@ export const pokeCharacterThemes = {
         "overlayDisabledText": "#687066",
         "focusRing": "#99F5C3",
         "scrollbarThumb": "#274937"
-      }
-    }
-  },
-  "yori": {
-    "id": "yori",
-    "name": "Yori",
-    "primary": "#B4AEE0",
-    "theme": {
-      "xterm": {
-        "background": "#16151E",
-        "foreground": "#E2E0EB",
-        "cursor": "#B4AEE0",
-        "cursorAccent": "#16151E",
-        "selectionBackground": "#2B2749",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#E2E0EB",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#16151E",
-        "panelBackground": "#1E1D26",
-        "tabBackground": "#252334",
-        "activeTabBackground": "#1F1D2A",
-        "activeTabBorder": "#B4AEE0",
-        "tabHoverBackground": "#2B2749",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#1E1D26",
-        "overlayBorder": "#B4AEE0",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#B4AEE0",
-        "scrollbarThumb": "#2B2749"
-      }
-    }
-  },
-  "runa": {
-    "id": "runa",
-    "name": "Runa",
-    "primary": "#C4EE4F",
-    "theme": {
-      "xterm": {
-        "background": "#1D1F16",
-        "foreground": "#E8EBE0",
-        "cursor": "#C4EE4F",
-        "cursorAccent": "#1D1F16",
-        "selectionBackground": "#404927",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#E8EBE0",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#1D1F16",
-        "panelBackground": "#23261D",
-        "tabBackground": "#2F3423",
-        "activeTabBackground": "#272A1D",
-        "activeTabBorder": "#C4EE4F",
-        "tabHoverBackground": "#404927",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#23261D",
-        "overlayBorder": "#C4EE4F",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#C4EE4F",
-        "scrollbarThumb": "#404927"
       }
     }
   },
