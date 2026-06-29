@@ -113,7 +113,7 @@ export function TerminalPane() {
     return () => {
       disposed = true;
       cleanupTasks.forEach((cleanup) => cleanup());
-      void invoke("close_session");
+      void invoke("close_session").catch(() => undefined);
       terminal.dispose();
       terminalRef.current = null;
       fitAddonRef.current = null;
