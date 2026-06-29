@@ -408,7 +408,7 @@ export function TerminalPane() {
               <button
                 type="button"
                 className="tab-character-button"
-                aria-label={isActive ? `Change ${character.name}` : `Select ${session.title}`}
+                aria-label={isActive ? `Change ${character.name}` : `Select ${character.name}`}
                 onClick={() => {
                   if (isActive) {
                     setPickerSessionId(session.id);
@@ -426,12 +426,12 @@ export function TerminalPane() {
                 className="tab-button"
                 onClick={() => activateSession(session.id)}
               >
-                <span className="tab-name">{session.title}</span>
+                <span className="tab-name">{character.name}</span>
               </button>
               <button
                 type="button"
                 className="tab-close"
-                aria-label={`Close ${session.title}`}
+                aria-label={`Close ${character.name}`}
                 onClick={() => closeSession(session.id)}
               >
                 x
