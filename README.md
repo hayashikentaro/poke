@@ -22,10 +22,30 @@ npm install
 npm run tauri dev
 ```
 
+This launches the Tauri desktop app and starts the frontend dev server that the app loads internally.
+
+## Verify Terminal Behavior
+
+Use the Tauri app for terminal testing:
+
+```sh
+npm run tauri dev
+```
+
+In the app window, verify:
+
+- A shell prompt appears.
+- Typed commands are echoed.
+- Command output appears in the terminal.
+- Resizing the window keeps the terminal usable.
+- Closing the app exits the shell session cleanly.
+
+Do not verify PTY behavior by opening the Vite dev server directly in a browser. Browser-only mode does not provide Tauri commands or events, so the Rust PTY backend cannot run there.
+
 ## Frontend-only development
 
 ```sh
 npm run dev
 ```
 
-The frontend-only server does not start the Rust PTY backend. Use `npm run tauri dev` when testing the terminal.
+Frontend-only development is useful for static React layout work, but it does not start the Rust PTY backend.
