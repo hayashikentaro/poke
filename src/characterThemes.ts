@@ -15,13 +15,10 @@ export type CharacterId =
   | "rina"
   | "sena"
   | "towa"
-  | "nono"
   | "riko"
-  | "hina"
   | "sumi"
   | "luka"
   | "nina"
-  | "mioi"
   | "tomo"
   | "yori"
   | "runa"
@@ -631,52 +628,6 @@ export const pokeCharacterThemes = {
       }
     }
   },
-  "nono": {
-    "id": "nono",
-    "name": "Nono",
-    "primary": "#EE99F5",
-    "theme": {
-      "xterm": {
-        "background": "#1D151E",
-        "foreground": "#EAE0EB",
-        "cursor": "#EE99F5",
-        "cursorAccent": "#1D151E",
-        "selectionBackground": "#462749",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#EAE0EB",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#1D151E",
-        "panelBackground": "#251D26",
-        "tabBackground": "#332334",
-        "activeTabBackground": "#291D2A",
-        "activeTabBorder": "#EE99F5",
-        "tabHoverBackground": "#462749",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#251D26",
-        "overlayBorder": "#EE99F5",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#EE99F5",
-        "scrollbarThumb": "#462749"
-      }
-    }
-  },
   "riko": {
     "id": "riko",
     "name": "Riko",
@@ -720,52 +671,6 @@ export const pokeCharacterThemes = {
         "overlayDisabledText": "#687066",
         "focusRing": "#B899F5",
         "scrollbarThumb": "#332749"
-      }
-    }
-  },
-  "hina": {
-    "id": "hina",
-    "name": "Hina",
-    "primary": "#9D99F5",
-    "theme": {
-      "xterm": {
-        "background": "#15141C",
-        "foreground": "#E1E0EB",
-        "cursor": "#9D99F5",
-        "cursorAccent": "#15141C",
-        "selectionBackground": "#292749",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#E1E0EB",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#15141C",
-        "panelBackground": "#1D1D26",
-        "tabBackground": "#232334",
-        "activeTabBackground": "#1E1D2A",
-        "activeTabBorder": "#9D99F5",
-        "tabHoverBackground": "#292749",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#1D1D26",
-        "overlayBorder": "#9D99F5",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#9D99F5",
-        "scrollbarThumb": "#292749"
       }
     }
   },
@@ -904,52 +809,6 @@ export const pokeCharacterThemes = {
         "overlayDisabledText": "#687066",
         "focusRing": "#F27CAB",
         "scrollbarThumb": "#492735"
-      }
-    }
-  },
-  "mioi": {
-    "id": "mioi",
-    "name": "Mioi",
-    "primary": "#F599C2",
-    "theme": {
-      "xterm": {
-        "background": "#1E1519",
-        "foreground": "#EBE0E5",
-        "cursor": "#F599C2",
-        "cursorAccent": "#1E1519",
-        "selectionBackground": "#492736",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#EBE0E5",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#1E1519",
-        "panelBackground": "#261D21",
-        "tabBackground": "#34232A",
-        "activeTabBackground": "#2A1D23",
-        "activeTabBorder": "#F599C2",
-        "tabHoverBackground": "#492736",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#261D21",
-        "overlayBorder": "#F599C2",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#F599C2",
-        "scrollbarThumb": "#492736"
       }
     }
   },
