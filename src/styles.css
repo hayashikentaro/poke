@@ -151,7 +151,7 @@ body {
   width: 32px;
   flex: 0 0 32px;
   color: var(--poke-muted-text);
-  font-size: 16px;
+  font-size: 24px;
 }
 
 .new-tab-button {
