@@ -101,7 +101,6 @@ body {
 
 .tab-item[data-active="true"] {
   color: var(--tab-text, var(--poke-tab-text));
-  border-color: var(--tab-active-border, var(--poke-active-tab-border));
   background: var(--tab-active-bg, var(--poke-active-tab-bg));
 }
 
