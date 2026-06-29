@@ -409,11 +409,12 @@ export function TerminalPane() {
               <button
                 type="button"
                 className="tab-character-button"
-                aria-label={`Change ${character.name}`}
-                disabled={!isActive}
+                aria-label={isActive ? `Change ${character.name}` : `Select ${session.title}`}
                 onClick={() => {
                   if (isActive) {
                     setPickerSessionId(session.id);
+                  } else {
+                    activateSession(session.id);
                   }
                 }}
               >
