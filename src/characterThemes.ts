@@ -10,7 +10,23 @@ export type CharacterId =
   | "nagi"
   | "yuzu"
   | "haru"
-  | "kiri";
+  | "kiri"
+  | "mika"
+  | "rina"
+  | "sena"
+  | "towa"
+  | "yura"
+  | "nono"
+  | "riko"
+  | "hina"
+  | "sumi"
+  | "luka"
+  | "nina"
+  | "mioi"
+  | "tomo"
+  | "yori"
+  | "runa"
+  | "kana";
 
 export type PokeXtermTheme = {
   background: string;
@@ -431,7 +447,744 @@ export const pokeCharacterThemes = {
         "scrollbarThumb": "#4B3D24"
       }
     }
+  },
+  "mika": {
+    "id": "mika",
+    "name": "Mika",
+    "primary": "#EED64F",
+    "theme": {
+      "xterm": {
+        "background": "#1F1E16",
+        "foreground": "#EBE9E0",
+        "cursor": "#EED64F",
+        "cursorAccent": "#1F1E16",
+        "selectionBackground": "#494427",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EBE9E0",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1F1E16",
+        "panelBackground": "#26241D",
+        "tabBackground": "#343123",
+        "activeTabBackground": "#2A281D",
+        "activeTabBorder": "#EED64F",
+        "tabHoverBackground": "#494427",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#26241D",
+        "overlayBorder": "#EED64F",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#EED64F",
+        "scrollbarThumb": "#494427"
+      }
+    }
+  },
+  "rina": {
+    "id": "rina",
+    "name": "Rina",
+    "primary": "#87C3F3",
+    "theme": {
+      "xterm": {
+        "background": "#14191C",
+        "foreground": "#E0E6EB",
+        "cursor": "#87C3F3",
+        "cursorAccent": "#14191C",
+        "selectionBackground": "#273A49",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E0E6EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#14191C",
+        "panelBackground": "#1D2226",
+        "tabBackground": "#232C34",
+        "activeTabBackground": "#1D242A",
+        "activeTabBorder": "#87C3F3",
+        "tabHoverBackground": "#273A49",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#1D2226",
+        "overlayBorder": "#87C3F3",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#87C3F3",
+        "scrollbarThumb": "#273A49"
+      }
+    }
+  },
+  "sena": {
+    "id": "sena",
+    "name": "Sena",
+    "primary": "#F5959B",
+    "theme": {
+      "xterm": {
+        "background": "#1E1516",
+        "foreground": "#EBE0E1",
+        "cursor": "#F5959B",
+        "cursorAccent": "#1E1516",
+        "selectionBackground": "#492729",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EBE0E1",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1E1516",
+        "panelBackground": "#261D1D",
+        "tabBackground": "#342324",
+        "activeTabBackground": "#2A1D1E",
+        "activeTabBorder": "#F5959B",
+        "tabHoverBackground": "#492729",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#261D1D",
+        "overlayBorder": "#F5959B",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#F5959B",
+        "scrollbarThumb": "#492729"
+      }
+    }
+  },
+  "towa": {
+    "id": "towa",
+    "name": "Towa",
+    "primary": "#EEB94F",
+    "theme": {
+      "xterm": {
+        "background": "#1E1B15",
+        "foreground": "#EBE7E0",
+        "cursor": "#EEB94F",
+        "cursorAccent": "#1E1B15",
+        "selectionBackground": "#493E27",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EBE7E0",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1E1B15",
+        "panelBackground": "#26231D",
+        "tabBackground": "#342E23",
+        "activeTabBackground": "#2A261D",
+        "activeTabBorder": "#EEB94F",
+        "tabHoverBackground": "#493E27",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#26231D",
+        "overlayBorder": "#EEB94F",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#EEB94F",
+        "scrollbarThumb": "#493E27"
+      }
+    }
+  },
+  "yura": {
+    "id": "yura",
+    "name": "Yura",
+    "primary": "#CD987A",
+    "theme": {
+      "xterm": {
+        "background": "#1E1815",
+        "foreground": "#EBE4E0",
+        "cursor": "#CD987A",
+        "cursorAccent": "#1E1815",
+        "selectionBackground": "#493327",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EBE4E0",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1E1815",
+        "panelBackground": "#26201D",
+        "tabBackground": "#342923",
+        "activeTabBackground": "#2A221D",
+        "activeTabBorder": "#CD987A",
+        "tabHoverBackground": "#493327",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#26201D",
+        "overlayBorder": "#CD987A",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#CD987A",
+        "scrollbarThumb": "#493327"
+      }
+    }
+  },
+  "nono": {
+    "id": "nono",
+    "name": "Nono",
+    "primary": "#EE99F5",
+    "theme": {
+      "xterm": {
+        "background": "#1D151E",
+        "foreground": "#EAE0EB",
+        "cursor": "#EE99F5",
+        "cursorAccent": "#1D151E",
+        "selectionBackground": "#462749",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EAE0EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1D151E",
+        "panelBackground": "#251D26",
+        "tabBackground": "#332334",
+        "activeTabBackground": "#291D2A",
+        "activeTabBorder": "#EE99F5",
+        "tabHoverBackground": "#462749",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#251D26",
+        "overlayBorder": "#EE99F5",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#EE99F5",
+        "scrollbarThumb": "#462749"
+      }
+    }
+  },
+  "riko": {
+    "id": "riko",
+    "name": "Riko",
+    "primary": "#B899F5",
+    "theme": {
+      "xterm": {
+        "background": "#18151E",
+        "foreground": "#E4E0EB",
+        "cursor": "#B899F5",
+        "cursorAccent": "#18151E",
+        "selectionBackground": "#332749",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E4E0EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#18151E",
+        "panelBackground": "#201D26",
+        "tabBackground": "#292334",
+        "activeTabBackground": "#221D2A",
+        "activeTabBorder": "#B899F5",
+        "tabHoverBackground": "#332749",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#201D26",
+        "overlayBorder": "#B899F5",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#B899F5",
+        "scrollbarThumb": "#332749"
+      }
+    }
+  },
+  "hina": {
+    "id": "hina",
+    "name": "Hina",
+    "primary": "#9D99F5",
+    "theme": {
+      "xterm": {
+        "background": "#15141C",
+        "foreground": "#E1E0EB",
+        "cursor": "#9D99F5",
+        "cursorAccent": "#15141C",
+        "selectionBackground": "#292749",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E1E0EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#15141C",
+        "panelBackground": "#1D1D26",
+        "tabBackground": "#232334",
+        "activeTabBackground": "#1E1D2A",
+        "activeTabBorder": "#9D99F5",
+        "tabHoverBackground": "#292749",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#1D1D26",
+        "overlayBorder": "#9D99F5",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#9D99F5",
+        "scrollbarThumb": "#292749"
+      }
+    }
+  },
+  "sumi": {
+    "id": "sumi",
+    "name": "Sumi",
+    "primary": "#C599F5",
+    "theme": {
+      "xterm": {
+        "background": "#19151E",
+        "foreground": "#E5E0EB",
+        "cursor": "#C599F5",
+        "cursorAccent": "#19151E",
+        "selectionBackground": "#372749",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E5E0EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#19151E",
+        "panelBackground": "#211D26",
+        "tabBackground": "#2B2334",
+        "activeTabBackground": "#231D2A",
+        "activeTabBorder": "#C599F5",
+        "tabHoverBackground": "#372749",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#211D26",
+        "overlayBorder": "#C599F5",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#C599F5",
+        "scrollbarThumb": "#372749"
+      }
+    }
+  },
+  "luka": {
+    "id": "luka",
+    "name": "Luka",
+    "primary": "#BD8AF3",
+    "theme": {
+      "xterm": {
+        "background": "#19151E",
+        "foreground": "#E5E0EB",
+        "cursor": "#BD8AF3",
+        "cursorAccent": "#19151E",
+        "selectionBackground": "#382749",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E5E0EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#19151E",
+        "panelBackground": "#211D26",
+        "tabBackground": "#2B2334",
+        "activeTabBackground": "#241D2A",
+        "activeTabBorder": "#BD8AF3",
+        "tabHoverBackground": "#382749",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#211D26",
+        "overlayBorder": "#BD8AF3",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#BD8AF3",
+        "scrollbarThumb": "#382749"
+      }
+    }
+  },
+  "nina": {
+    "id": "nina",
+    "name": "Nina",
+    "primary": "#F27CAB",
+    "theme": {
+      "xterm": {
+        "background": "#1E1519",
+        "foreground": "#EBE0E4",
+        "cursor": "#F27CAB",
+        "cursorAccent": "#1E1519",
+        "selectionBackground": "#492735",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EBE0E4",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1E1519",
+        "panelBackground": "#261D20",
+        "tabBackground": "#34232A",
+        "activeTabBackground": "#2A1D22",
+        "activeTabBorder": "#F27CAB",
+        "tabHoverBackground": "#492735",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#261D20",
+        "overlayBorder": "#F27CAB",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#F27CAB",
+        "scrollbarThumb": "#492735"
+      }
+    }
+  },
+  "mioi": {
+    "id": "mioi",
+    "name": "Mioi",
+    "primary": "#F599C2",
+    "theme": {
+      "xterm": {
+        "background": "#1E1519",
+        "foreground": "#EBE0E5",
+        "cursor": "#F599C2",
+        "cursorAccent": "#1E1519",
+        "selectionBackground": "#492736",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#EBE0E5",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1E1519",
+        "panelBackground": "#261D21",
+        "tabBackground": "#34232A",
+        "activeTabBackground": "#2A1D23",
+        "activeTabBorder": "#F599C2",
+        "tabHoverBackground": "#492736",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#261D21",
+        "overlayBorder": "#F599C2",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#F599C2",
+        "scrollbarThumb": "#492736"
+      }
+    }
+  },
+  "tomo": {
+    "id": "tomo",
+    "name": "Tomo",
+    "primary": "#99F5C3",
+    "theme": {
+      "xterm": {
+        "background": "#151E19",
+        "foreground": "#E0EBE5",
+        "cursor": "#99F5C3",
+        "cursorAccent": "#151E19",
+        "selectionBackground": "#274937",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E0EBE5",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#151E19",
+        "panelBackground": "#1D2621",
+        "tabBackground": "#23342B",
+        "activeTabBackground": "#1D2A23",
+        "activeTabBorder": "#99F5C3",
+        "tabHoverBackground": "#274937",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#1D2621",
+        "overlayBorder": "#99F5C3",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#99F5C3",
+        "scrollbarThumb": "#274937"
+      }
+    }
+  },
+  "yori": {
+    "id": "yori",
+    "name": "Yori",
+    "primary": "#B4AEE0",
+    "theme": {
+      "xterm": {
+        "background": "#16151E",
+        "foreground": "#E2E0EB",
+        "cursor": "#B4AEE0",
+        "cursorAccent": "#16151E",
+        "selectionBackground": "#2B2749",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E2E0EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#16151E",
+        "panelBackground": "#1E1D26",
+        "tabBackground": "#252334",
+        "activeTabBackground": "#1F1D2A",
+        "activeTabBorder": "#B4AEE0",
+        "tabHoverBackground": "#2B2749",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#1E1D26",
+        "overlayBorder": "#B4AEE0",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#B4AEE0",
+        "scrollbarThumb": "#2B2749"
+      }
+    }
+  },
+  "runa": {
+    "id": "runa",
+    "name": "Runa",
+    "primary": "#C4EE4F",
+    "theme": {
+      "xterm": {
+        "background": "#1D1F16",
+        "foreground": "#E8EBE0",
+        "cursor": "#C4EE4F",
+        "cursorAccent": "#1D1F16",
+        "selectionBackground": "#404927",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E8EBE0",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#1D1F16",
+        "panelBackground": "#23261D",
+        "tabBackground": "#2F3423",
+        "activeTabBackground": "#272A1D",
+        "activeTabBorder": "#C4EE4F",
+        "tabHoverBackground": "#404927",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#23261D",
+        "overlayBorder": "#C4EE4F",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#C4EE4F",
+        "scrollbarThumb": "#404927"
+      }
+    }
+  },
+  "kana": {
+    "id": "kana",
+    "name": "Kana",
+    "primary": "#99E5F5",
+    "theme": {
+      "xterm": {
+        "background": "#141B1C",
+        "foreground": "#E0E9EB",
+        "cursor": "#99E5F5",
+        "cursorAccent": "#141B1C",
+        "selectionBackground": "#274349",
+        "black": "#151515",
+        "red": "#FF6B6B",
+        "green": "#A7F3A1",
+        "yellow": "#FFE082",
+        "blue": "#82AAFF",
+        "magenta": "#C792EA",
+        "cyan": "#89DDFF",
+        "white": "#E0E9EB",
+        "brightBlack": "#5F6660",
+        "brightRed": "#FF8A8A",
+        "brightGreen": "#B9F8B2",
+        "brightYellow": "#FFE9A8",
+        "brightBlue": "#A6BDFF",
+        "brightMagenta": "#D6A8FF",
+        "brightCyan": "#A7EAFF",
+        "brightWhite": "#FFFFFF"
+      },
+      "ui": {
+        "appBackground": "#141B1C",
+        "panelBackground": "#1D2426",
+        "tabBackground": "#233134",
+        "activeTabBackground": "#1D282A",
+        "activeTabBorder": "#99E5F5",
+        "tabHoverBackground": "#274349",
+        "tabText": "#E8EBDD",
+        "mutedText": "#AEB8AA",
+        "overlayBackground": "#1D2426",
+        "overlayBorder": "#99E5F5",
+        "overlayText": "#E8EBDD",
+        "overlayDisabledText": "#687066",
+        "focusRing": "#99E5F5",
+        "scrollbarThumb": "#274349"
+      }
+    }
   }
+
 } as const satisfies Record<CharacterId, PokeCharacterTheme>;
 
 export function getCharacterTheme(characterId: CharacterId): PokeCharacterTheme {
