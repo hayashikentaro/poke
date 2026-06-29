@@ -105,11 +105,6 @@ body {
   background: var(--tab-active-bg, var(--poke-active-tab-bg));
 }
 
-.tab-item:hover {
-  color: var(--tab-text, var(--poke-tab-text));
-  background: var(--tab-hover-bg, var(--poke-tab-hover-bg));
-}
-
 .tab-button,
 .tab-character-button,
 .tab-close,
@@ -157,13 +152,6 @@ body {
   flex: 0 0 42px;
   color: var(--poke-muted-text);
   font-size: 18px;
-}
-
-.tab-button:hover,
-.tab-character-button:hover,
-.tab-close:hover,
-.new-tab-button:hover {
-  background: var(--poke-tab-hover-bg);
 }
 
 .tab-name {
