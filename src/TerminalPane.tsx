@@ -8,6 +8,7 @@ import {
   getCharacterTheme,
   type CharacterId
 } from "./characterThemes";
+import { appConfig } from "./appConfig";
 import "@xterm/xterm/css/xterm.css";
 
 type AttentionState = "not_now" | "needs_you";
@@ -85,7 +86,7 @@ function createTerminal() {
     cursorBlink: true,
     fontFamily:
       'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
-    fontSize: 14,
+    fontSize: appConfig.terminal.fontSize,
     lineHeight: 1.2,
     theme: getCharacterTheme(characters[0].id).theme.xterm
   });

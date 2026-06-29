@@ -79,6 +79,10 @@ In the app window, verify:
 
 Do not verify PTY behavior by opening the Vite dev server directly in a browser. Browser-only mode does not provide Tauri commands or events, so the Rust PTY backend cannot run there.
 
+## App Configuration
+
+Terminal font size is configured in `src/appConfig.ts`.
+
 ## Frontend-only development
 
 ```sh
