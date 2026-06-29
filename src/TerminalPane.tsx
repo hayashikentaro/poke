@@ -277,6 +277,7 @@ export function TerminalPane() {
   }, [activeSessionId]);
 
   const activateSession = useCallback((sessionId: string) => {
+    setPickerSessionId(null);
     setActiveSessionId(sessionId);
     setSessions((currentSessions) =>
       currentSessions.map((session) =>
@@ -332,10 +333,12 @@ export function TerminalPane() {
     };
 
     setSessions((currentSessions) => [...currentSessions, session]);
+    setPickerSessionId(null);
     setActiveSessionId(session.id);
   };
 
   const closeSession = (sessionId: string) => {
+    setPickerSessionId(null);
     setSessions((currentSessions) => {
       const closingIndex = currentSessions.findIndex((session) => session.id === sessionId);
       const remainingSessions = currentSessions.filter((session) => session.id !== sessionId);
@@ -356,10 +359,6 @@ export function TerminalPane() {
       if (activeSessionId === sessionId) {
         const nextIndex = Math.min(closingIndex, remainingSessions.length - 1);
         setActiveSessionId(remainingSessions[nextIndex].id);
-      }
-
-      if (pickerSessionId === sessionId) {
-        setPickerSessionId(null);
       }
 
       return remainingSessions;
