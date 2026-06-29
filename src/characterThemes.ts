@@ -15,7 +15,6 @@ export type CharacterId =
   | "rina"
   | "sena"
   | "towa"
-  | "yura"
   | "nono"
   | "riko"
   | "hina"
@@ -629,52 +628,6 @@ export const pokeCharacterThemes = {
         "overlayDisabledText": "#687066",
         "focusRing": "#EEB94F",
         "scrollbarThumb": "#493E27"
-      }
-    }
-  },
-  "yura": {
-    "id": "yura",
-    "name": "Yura",
-    "primary": "#CD987A",
-    "theme": {
-      "xterm": {
-        "background": "#1E1815",
-        "foreground": "#EBE4E0",
-        "cursor": "#CD987A",
-        "cursorAccent": "#1E1815",
-        "selectionBackground": "#493327",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#EBE4E0",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#1E1815",
-        "panelBackground": "#26201D",
-        "tabBackground": "#342923",
-        "activeTabBackground": "#2A221D",
-        "activeTabBorder": "#CD987A",
-        "tabHoverBackground": "#493327",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#26201D",
-        "overlayBorder": "#CD987A",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#CD987A",
-        "scrollbarThumb": "#493327"
       }
     }
   },
