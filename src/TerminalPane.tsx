@@ -531,10 +531,20 @@ export function TerminalPane() {
                 className="tab-button"
                 draggable
                 onDragStart={(event) => {
+                  const tabElement = event.currentTarget.closest(".tab-item");
+
                   setPickerSessionId(null);
                   setDraggingSessionId(session.id);
                   event.dataTransfer.effectAllowed = "move";
                   event.dataTransfer.setData("text/plain", session.id);
+
+                  if (tabElement instanceof HTMLElement) {
+                    event.dataTransfer.setDragImage(
+                      tabElement,
+                      tabElement.offsetWidth / 2,
+                      tabElement.offsetHeight / 2
+                    );
+                  }
                 }}
                 onDragEnd={() => setDraggingSessionId(null)}
                 onClick={() => activateSession(session.id)}
