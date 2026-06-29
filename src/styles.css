@@ -173,7 +173,13 @@ body {
   min-height: 0;
   padding: 10px;
   overflow: hidden;
-  background: var(--poke-app-bg);
+  background:
+    linear-gradient(
+      135deg,
+      var(--poke-app-bg) 0%,
+      color-mix(in srgb, var(--poke-app-bg) 88%, #000000 12%) 55%,
+      color-mix(in srgb, var(--poke-app-bg) 70%, #000000 30%) 100%
+    );
 }
 
 .terminal-surface {
@@ -187,6 +193,7 @@ body {
 
 .terminal-surface .xterm {
   height: 100%;
+  background: transparent;
 }
 
 .terminal-surface .xterm-viewport {
