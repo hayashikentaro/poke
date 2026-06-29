@@ -1,9 +1,10 @@
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
-    env,
+    env, fs,
     io::{Read, Write},
+    path::PathBuf,
     sync::{Arc, Mutex},
     thread,
 };
@@ -30,6 +31,46 @@ struct SessionOutput {
 struct SessionExit {
     id: String,
     code: Option<i32>,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AppConfig {
+    terminal: TerminalConfig,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TerminalConfig {
+    font_size: u16,
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            terminal: TerminalConfig { font_size: 18 },
+        }
+    }
+}
+
+#[tauri::command]
+fn get_app_config(app: AppHandle) -> Result<AppConfig, String> {
+    let config_path = app_config_path(&app)?;
+
+    if !config_path.exists() {
+        let config = AppConfig::default();
+        write_default_app_config(&config_path, &config)?;
+        return Ok(config);
+    }
+
+    let config_text = fs::read_to_string(&config_path).map_err(|error| error.to_string())?;
+    serde_json::from_str(&config_text).map_err(|error| {
+        format!(
+            "failed to parse config at {}: {}",
+            config_path.display(),
+            error
+        )
+    })
 }
 
 #[tauri::command]
@@ -221,6 +262,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(TerminalState::default())
         .invoke_handler(tauri::generate_handler![
+            get_app_config,
             create_session,
             write_to_session,
             resize_session,
@@ -245,4 +287,18 @@ fn default_shell() -> String {
             "/bin/sh".to_string()
         }
     })
+}
+
+fn app_config_path(app: &AppHandle) -> Result<PathBuf, String> {
+    let config_dir = app
+        .path()
+        .app_config_dir()
+        .map_err(|error| error.to_string())?;
+    fs::create_dir_all(&config_dir).map_err(|error| error.to_string())?;
+    Ok(config_dir.join("config.json"))
+}
+
+fn write_default_app_config(config_path: &PathBuf, config: &AppConfig) -> Result<(), String> {
+    let config_text = serde_json::to_string_pretty(config).map_err(|error| error.to_string())?;
+    fs::write(config_path, format!("{config_text}\n")).map_err(|error| error.to_string())
 }

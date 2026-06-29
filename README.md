@@ -81,7 +81,25 @@ Do not verify PTY behavior by opening the Vite dev server directly in a browser.
 
 ## App Configuration
 
-Terminal font size is configured in `src/appConfig.ts`.
+At runtime, Poke reads configuration from the app config directory:
+
+```sh
+~/Library/Application Support/com.poke.terminal/config.json
+```
+
+The file is created with defaults the first time the Tauri app runs. To change the terminal font size after building the app, edit:
+
+```json
+{
+  "terminal": {
+    "fontSize": 18
+  }
+}
+```
+
+Restart the app after editing the file.
+
+Development defaults live in `src/appConfig.ts`.
 
 ## Frontend-only development
 

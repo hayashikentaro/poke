@@ -8,7 +8,7 @@ import {
   getCharacterTheme,
   type CharacterId
 } from "./characterThemes";
-import { appConfig } from "./appConfig";
+import { defaultAppConfig, type AppConfig } from "./appConfig";
 import "@xterm/xterm/css/xterm.css";
 
 type AttentionState = "not_now" | "needs_you";
@@ -41,6 +41,7 @@ type SessionExit = {
 
 type TerminalSurfaceProps = {
   active: boolean;
+  config: AppConfig;
   onExit: (sessionId: string) => void;
   onOutput: (sessionId: string) => void;
   session: TerminalSession;
@@ -81,18 +82,18 @@ function getNextCharacterId(sessions: TerminalSession[]) {
   return characters.find((character) => !used.has(character.id))?.id ?? characters[sessions.length % characters.length].id;
 }
 
-function createTerminal() {
+function createTerminal(config: AppConfig) {
   return new Terminal({
     cursorBlink: true,
     fontFamily:
       '"Commit Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
-    fontSize: appConfig.terminal.fontSize,
+    fontSize: config.terminal.fontSize,
     lineHeight: 1.2,
     theme: getCharacterTheme(characters[0].id).theme.xterm
   });
 }
 
-function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceProps) {
+function TerminalSurface({ active, config, onExit, onOutput, session }: TerminalSurfaceProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -104,7 +105,7 @@ function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceP
       return;
     }
 
-    const terminal = createTerminal();
+    const terminal = createTerminal(config);
     const fitAddon = new FitAddon();
     terminal.options.theme = getCharacterTheme(session.characterId).theme.xterm;
 
@@ -186,6 +187,25 @@ function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceP
 
   useEffect(() => {
     const terminal = terminalRef.current;
+    const fitAddon = fitAddonRef.current;
+
+    if (!terminal || !fitAddon) {
+      return;
+    }
+
+    terminal.options.fontSize = config.terminal.fontSize;
+    requestAnimationFrame(() => {
+      fitAddon.fit();
+      void invoke("resize_session", {
+        id: session.id,
+        cols: terminal.cols,
+        rows: terminal.rows
+      }).catch(() => undefined);
+    });
+  }, [config.terminal.fontSize, session.id]);
+
+  useEffect(() => {
+    const terminal = terminalRef.current;
 
     if (terminal) {
       terminal.options.theme = getCharacterTheme(session.characterId).theme.xterm;
@@ -226,6 +246,7 @@ function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceP
 
 export function TerminalPane() {
   const nextTabIndex = useRef(2);
+  const [config, setConfig] = useState<AppConfig>(defaultAppConfig);
   const initialSession = useMemo<TerminalSession>(
     () => ({
       id: crypto.randomUUID(),
@@ -241,6 +262,14 @@ export function TerminalPane() {
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
+
+  useEffect(() => {
+    void invoke<AppConfig>("get_app_config")
+      .then(setConfig)
+      .catch((error: unknown) => {
+        console.error("Failed to load app config", error);
+      });
+  }, []);
 
   useEffect(() => {
     applyPokeUiTheme(getCharacterTheme(activeSession.characterId).theme.ui);
@@ -457,6 +486,7 @@ export function TerminalPane() {
           <TerminalSurface
             key={session.id}
             active={session.id === activeSessionId}
+            config={config}
             onExit={handleSessionExit}
             onOutput={handleSessionOutput}
             session={session}
