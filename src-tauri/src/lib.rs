@@ -45,6 +45,9 @@ struct TerminalConfig {
     font_size: u16,
 }
 
+const MIN_TERMINAL_FONT_SIZE: u16 = 10;
+const MAX_TERMINAL_FONT_SIZE: u16 = 32;
+
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
@@ -55,22 +58,17 @@ impl Default for AppConfig {
 
 #[tauri::command]
 fn get_app_config(app: AppHandle) -> Result<AppConfig, String> {
+    read_app_config(&app)
+}
+
+#[tauri::command]
+fn update_terminal_font_size(app: AppHandle, font_size: u16) -> Result<AppConfig, String> {
+    let font_size = font_size.clamp(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE);
+    let mut config = read_app_config(&app)?;
+    config.terminal.font_size = font_size;
     let config_path = app_config_path(&app)?;
-
-    if !config_path.exists() {
-        let config = AppConfig::default();
-        write_default_app_config(&config_path, &config)?;
-        return Ok(config);
-    }
-
-    let config_text = fs::read_to_string(&config_path).map_err(|error| error.to_string())?;
-    serde_json::from_str(&config_text).map_err(|error| {
-        format!(
-            "failed to parse config at {}: {}",
-            config_path.display(),
-            error
-        )
-    })
+    write_default_app_config(&config_path, &config)?;
+    Ok(config)
 }
 
 #[tauri::command]
@@ -263,6 +261,7 @@ pub fn run() {
         .manage(TerminalState::default())
         .invoke_handler(tauri::generate_handler![
             get_app_config,
+            update_terminal_font_size,
             create_session,
             write_to_session,
             resize_session,
@@ -301,4 +300,23 @@ fn app_config_path(app: &AppHandle) -> Result<PathBuf, String> {
 fn write_default_app_config(config_path: &PathBuf, config: &AppConfig) -> Result<(), String> {
     let config_text = serde_json::to_string_pretty(config).map_err(|error| error.to_string())?;
     fs::write(config_path, format!("{config_text}\n")).map_err(|error| error.to_string())
+}
+
+fn read_app_config(app: &AppHandle) -> Result<AppConfig, String> {
+    let config_path = app_config_path(app)?;
+
+    if !config_path.exists() {
+        let config = AppConfig::default();
+        write_default_app_config(&config_path, &config)?;
+        return Ok(config);
+    }
+
+    let config_text = fs::read_to_string(&config_path).map_err(|error| error.to_string())?;
+    serde_json::from_str(&config_text).map_err(|error| {
+        format!(
+            "failed to parse config at {}: {}",
+            config_path.display(),
+            error
+        )
+    })
 }

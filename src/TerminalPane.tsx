@@ -49,6 +49,8 @@ type TerminalSurfaceProps = {
 
 const quietThresholdMs = 5000;
 const skinBasePath = "/skins/default-poke-crew/characters";
+const minTerminalFontSize = 10;
+const maxTerminalFontSize = 32;
 
 function spriteCharacter(id: CharacterId, name: string): Character {
   const basePath = `${skinBasePath}/${id}`;
@@ -270,6 +272,45 @@ export function TerminalPane() {
         console.error("Failed to load app config", error);
       });
   }, []);
+
+  const updateTerminalFontSize = useCallback((fontSize: number) => {
+    const nextFontSize = Math.max(minTerminalFontSize, Math.min(maxTerminalFontSize, fontSize));
+
+    setConfig((currentConfig) => ({
+      ...currentConfig,
+      terminal: {
+        ...currentConfig.terminal,
+        fontSize: nextFontSize
+      }
+    }));
+
+    void invoke<AppConfig>("update_terminal_font_size", { fontSize: nextFontSize })
+      .then(setConfig)
+      .catch((error: unknown) => {
+        console.error("Failed to save terminal font size", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (event.key === "+" || event.key === "=") {
+        event.preventDefault();
+        updateTerminalFontSize(config.terminal.fontSize + 1);
+      }
+
+      if (event.key === "-") {
+        event.preventDefault();
+        updateTerminalFontSize(config.terminal.fontSize - 1);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [config.terminal.fontSize, updateTerminalFontSize]);
 
   useEffect(() => {
     applyPokeUiTheme(getCharacterTheme(activeSession.characterId).theme.ui);

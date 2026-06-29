@@ -97,7 +97,9 @@ The file is created with defaults the first time the Tauri app runs. To change t
 }
 ```
 
-Restart the app after editing the file.
+Restart the app after editing the file manually.
+
+While the app is running, use `Command + +` or `Command + -` to change the terminal font size. The new size is saved to `config.json`.
 
 Development defaults live in `src/appConfig.ts`.
 
