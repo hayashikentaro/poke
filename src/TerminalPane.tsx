@@ -386,12 +386,23 @@ export function TerminalPane() {
       <div className="tab-bar" role="tablist" aria-label="Terminal tabs">
         {sessions.map((session) => {
           const character = getCharacter(session.characterId);
+          const tabTheme = getCharacterTheme(session.characterId).theme.ui;
 
           return (
             <div
               key={session.id}
               className="tab-item"
               data-active={session.id === activeSessionId ? "true" : "false"}
+              style={
+                {
+                  "--tab-bg": tabTheme.tabBackground,
+                  "--tab-active-bg": tabTheme.activeTabBackground,
+                  "--tab-active-border": tabTheme.activeTabBorder,
+                  "--tab-hover-bg": tabTheme.tabHoverBackground,
+                  "--tab-text": tabTheme.tabText,
+                  "--tab-muted-text": tabTheme.mutedText
+                } as React.CSSProperties
+              }
             >
               <button
                 type="button"

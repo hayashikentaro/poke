@@ -95,19 +95,19 @@ body {
   border: 1px solid transparent;
   border-bottom: 0;
   border-radius: 6px 6px 0 0;
-  color: var(--poke-muted-text);
-  background: var(--poke-tab-bg);
+  color: var(--tab-muted-text, var(--poke-muted-text));
+  background: var(--tab-bg, var(--poke-tab-bg));
 }
 
 .tab-item[data-active="true"] {
-  color: var(--poke-tab-text);
-  border-color: var(--poke-active-tab-border);
-  background: var(--poke-active-tab-bg);
+  color: var(--tab-text, var(--poke-tab-text));
+  border-color: var(--tab-active-border, var(--poke-active-tab-border));
+  background: var(--tab-active-bg, var(--poke-active-tab-bg));
 }
 
 .tab-item:hover {
-  color: var(--poke-tab-text);
-  background: var(--poke-tab-hover-bg);
+  color: var(--tab-text, var(--poke-tab-text));
+  background: var(--tab-hover-bg, var(--poke-tab-hover-bg));
 }
 
 .tab-button,
