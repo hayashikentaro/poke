@@ -297,7 +297,7 @@ export function TerminalPane() {
         return;
       }
 
-      if (event.key === "+" || event.key === "=") {
+      if (event.key === "+" || event.key === "=" || event.code === "Semicolon") {
         event.preventDefault();
         updateTerminalFontSize(config.terminal.fontSize + 1);
       }
