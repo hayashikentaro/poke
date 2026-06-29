@@ -1,6 +1,7 @@
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use serde::Serialize;
 use std::{
+    collections::HashMap,
     env,
     io::{Read, Write},
     sync::{Arc, Mutex},
@@ -10,7 +11,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 #[derive(Default)]
 struct TerminalState {
-    session: Mutex<Option<TerminalSession>>,
+    sessions: Mutex<HashMap<String, TerminalSession>>,
 }
 
 struct TerminalSession {
@@ -21,11 +22,13 @@ struct TerminalSession {
 
 #[derive(Clone, Serialize)]
 struct SessionOutput {
+    id: String,
     data: String,
 }
 
 #[derive(Clone, Serialize)]
 struct SessionExit {
+    id: String,
     code: Option<i32>,
 }
 
@@ -33,15 +36,16 @@ struct SessionExit {
 fn create_session(
     app: AppHandle,
     state: State<'_, TerminalState>,
+    id: String,
     cols: u16,
     rows: u16,
 ) -> Result<(), String> {
-    let mut session_guard = state
-        .session
+    let mut sessions_guard = state
+        .sessions
         .lock()
         .map_err(|_| "terminal state lock poisoned".to_string())?;
 
-    if session_guard.is_some() {
+    if sessions_guard.contains_key(&id) {
         return Ok(());
     }
 
@@ -72,6 +76,7 @@ fn create_session(
     let child = Arc::new(Mutex::new(child));
     let reader_child = Arc::clone(&child);
     let reader_app = app.clone();
+    let reader_id = id.clone();
 
     thread::spawn(move || {
         let mut buffer = [0_u8; 8192];
@@ -81,7 +86,13 @@ fn create_session(
                 Ok(0) => break,
                 Ok(bytes_read) => {
                     let data = String::from_utf8_lossy(&buffer[..bytes_read]).to_string();
-                    let _ = reader_app.emit("session_output", SessionOutput { data });
+                    let _ = reader_app.emit(
+                        "session_output",
+                        SessionOutput {
+                            id: reader_id.clone(),
+                            data,
+                        },
+                    );
                 }
                 Err(_) => break,
             }
@@ -92,33 +103,46 @@ fn create_session(
             .ok()
             .and_then(|mut child| child.wait().ok())
             .map(|status| status.exit_code() as i32);
-        let _ = reader_app.emit("session_exit", SessionExit { code });
+        let _ = reader_app.emit(
+            "session_exit",
+            SessionExit {
+                id: reader_id.clone(),
+                code,
+            },
+        );
 
         if let Some(state) = reader_app.try_state::<TerminalState>() {
-            if let Ok(mut session_guard) = state.session.lock() {
-                *session_guard = None;
+            if let Ok(mut sessions_guard) = state.sessions.lock() {
+                sessions_guard.remove(&reader_id);
             }
         }
     });
 
-    *session_guard = Some(TerminalSession {
-        writer: Arc::new(Mutex::new(writer)),
-        master: pair.master,
-        child,
-    });
+    sessions_guard.insert(
+        id,
+        TerminalSession {
+            writer: Arc::new(Mutex::new(writer)),
+            master: pair.master,
+            child,
+        },
+    );
 
     Ok(())
 }
 
 #[tauri::command]
-fn write_to_session(state: State<'_, TerminalState>, data: String) -> Result<(), String> {
+fn write_to_session(
+    state: State<'_, TerminalState>,
+    id: String,
+    data: String,
+) -> Result<(), String> {
     let writer = {
-        let session_guard = state
-            .session
+        let sessions_guard = state
+            .sessions
             .lock()
             .map_err(|_| "terminal state lock poisoned".to_string())?;
-        session_guard
-            .as_ref()
+        sessions_guard
+            .get(&id)
             .map(|session| Arc::clone(&session.writer))
             .ok_or_else(|| "no active terminal session".to_string())?
     };
@@ -133,13 +157,18 @@ fn write_to_session(state: State<'_, TerminalState>, data: String) -> Result<(),
 }
 
 #[tauri::command]
-fn resize_session(state: State<'_, TerminalState>, cols: u16, rows: u16) -> Result<(), String> {
-    let session_guard = state
-        .session
+fn resize_session(
+    state: State<'_, TerminalState>,
+    id: String,
+    cols: u16,
+    rows: u16,
+) -> Result<(), String> {
+    let sessions_guard = state
+        .sessions
         .lock()
         .map_err(|_| "terminal state lock poisoned".to_string())?;
 
-    if let Some(session) = session_guard.as_ref() {
+    if let Some(session) = sessions_guard.get(&id) {
         session
             .master
             .resize(PtySize {
@@ -155,12 +184,12 @@ fn resize_session(state: State<'_, TerminalState>, cols: u16, rows: u16) -> Resu
 }
 
 #[tauri::command]
-fn close_session(state: State<'_, TerminalState>) -> Result<(), String> {
+fn close_session(state: State<'_, TerminalState>, id: String) -> Result<(), String> {
     let session = state
-        .session
+        .sessions
         .lock()
         .map_err(|_| "terminal state lock poisoned".to_string())?
-        .take();
+        .remove(&id);
 
     if let Some(session) = session {
         if let Ok(mut child) = session.child.lock() {
@@ -169,6 +198,23 @@ fn close_session(state: State<'_, TerminalState>) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+fn close_all_sessions(state: State<'_, TerminalState>) {
+    let sessions = state.sessions.lock().ok().map(|mut sessions| {
+        sessions
+            .drain()
+            .map(|(_, session)| session)
+            .collect::<Vec<_>>()
+    });
+
+    if let Some(sessions) = sessions {
+        for session in sessions {
+            if let Ok(mut child) = session.child.lock() {
+                let _ = child.kill();
+            }
+        }
+    }
 }
 
 pub fn run() {
@@ -183,7 +229,7 @@ pub fn run() {
         .on_window_event(|window, event| {
             if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                 if let Some(state) = window.try_state::<TerminalState>() {
-                    let _ = close_session(state);
+                    close_all_sessions(state);
                 }
             }
         })

@@ -37,23 +37,107 @@ body {
   background: #090b10;
 }
 
-.terminal-pane {
+.terminal-workspace {
+  display: grid;
   width: 100%;
   height: 100%;
   min-height: 100vh;
+  grid-template-rows: 36px minmax(0, 1fr);
+  background: #090b10;
+}
+
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom: 1px solid #242936;
+  background: #11151d;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  min-width: 112px;
+  max-width: 200px;
+  height: 100%;
+  border-right: 1px solid #242936;
+  background: #171c26;
+}
+
+.tab-item[data-active="true"] {
+  background: #090b10;
+}
+
+.tab-button,
+.tab-close,
+.new-tab-button {
+  height: 100%;
+  border: 0;
+  color: #d7deeb;
+  background: transparent;
+  font: inherit;
+}
+
+.tab-button {
+  min-width: 0;
+  flex: 1;
+  padding: 0 10px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-close {
+  width: 32px;
+  flex: 0 0 32px;
+  color: #8792a6;
+  font-size: 14px;
+}
+
+.new-tab-button {
+  width: 38px;
+  flex: 0 0 38px;
+  color: #b8c3d6;
+  font-size: 18px;
+}
+
+.tab-button:hover,
+.tab-close:hover,
+.new-tab-button:hover {
+  background: #242936;
+}
+
+.terminal-pane {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   padding: 10px;
   overflow: hidden;
   background: #090b10;
 }
 
-.terminal-pane .xterm {
+.terminal-surface {
+  width: 100%;
   height: 100%;
 }
 
-.terminal-pane .xterm-viewport {
+.terminal-surface[data-active="false"] {
+  display: none;
+}
+
+.terminal-surface .xterm {
+  height: 100%;
+}
+
+.terminal-surface .xterm-viewport {
   background: transparent;
 }
 
-.terminal-pane .xterm-screen {
+.terminal-surface .xterm-screen {
   width: 100%;
 }

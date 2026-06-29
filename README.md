@@ -1,8 +1,8 @@
 # Poke
 
-Poke is a Tauri desktop terminal app. The current prototype runs one real shell session through xterm.js and a Rust PTY backend.
+Poke is a Tauri desktop terminal app. The current prototype runs multiple real shell sessions through xterm.js and a Rust PTY backend.
 
-Tabs, characters, AI, notifications, persistence, command palette, and settings are intentionally not implemented yet.
+Characters, AI, notifications, persistence, command palette, and settings are intentionally not implemented yet.
 
 ## Requirements
 
@@ -67,6 +67,9 @@ In the app window, verify:
 - A shell prompt appears.
 - Typed commands are echoed.
 - Command output appears in the terminal.
+- The `+` button opens another terminal tab.
+- Switching tabs preserves each terminal buffer.
+- Closing a tab closes that tab's shell session.
 - Resizing the window keeps the terminal usable.
 - Closing the app exits the shell session cleanly.
 
