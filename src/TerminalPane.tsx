@@ -550,7 +550,12 @@ function CharacterPicker({
   return (
     <div className="picker-layer" aria-modal="true" role="dialog" aria-label="Change character">
       <div className="character-picker">
-        <div className="picker-title">CHANGE CHARACTER</div>
+        <div className="picker-header">
+          <div className="picker-title">CHANGE CHARACTER</div>
+          <button type="button" className="picker-close" aria-label="Close character picker" onClick={onClose}>
+            x
+          </button>
+        </div>
         <div className="picker-list">
           {characters.map((character, index) => {
             const current = character.id === session.characterId;
