@@ -70,10 +70,15 @@ In the app window, verify:
 - The `+` button opens another terminal tab.
 - Switching tabs preserves each terminal buffer.
 - Closing a tab closes that tab's shell session.
+- Inactive tabs show temporary attention text: `not_now` or `needs_you`.
+- A non-active tab becomes `needs_you` after 5 seconds without output.
+- Activating a `needs_you` tab resets it to `not_now`.
 - Resizing the window keeps the terminal usable.
 - Closing the app exits the shell session cleanly.
 
 Do not verify PTY behavior by opening the Vite dev server directly in a browser. Browser-only mode does not provide Tauri commands or events, so the Rust PTY backend cannot run there.
+
+The attention text in tab labels is temporary. It is only present so the timer behavior can be verified before character UI is added.
 
 ## Frontend-only development
 

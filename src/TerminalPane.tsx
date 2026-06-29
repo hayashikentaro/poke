@@ -1,13 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 
+type AttentionState = "not_now" | "needs_you";
+
 type TerminalSession = {
   id: string;
   title: string;
+  attention: AttentionState;
+  lastOutputAt: number | null;
 };
 
 type SessionOutput = {
@@ -22,8 +26,12 @@ type SessionExit = {
 
 type TerminalSurfaceProps = {
   active: boolean;
+  onExit: (sessionId: string) => void;
+  onOutput: (sessionId: string) => void;
   session: TerminalSession;
 };
+
+const quietThresholdMs = 5000;
 
 function createTerminal() {
   return new Terminal({
@@ -56,7 +64,7 @@ function createTerminal() {
   });
 }
 
-function TerminalSurface({ active, session }: TerminalSurfaceProps) {
+function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -97,11 +105,16 @@ function TerminalSurface({ active, session }: TerminalSurfaceProps) {
       const unlistenOutput = await listen<SessionOutput>("session_output", (event) => {
         if (event.payload.id === session.id) {
           terminal.write(event.payload.data);
+          onOutput(session.id);
         }
       });
       cleanupTasks.push(unlistenOutput);
 
-      const unlistenExit = await listen<SessionExit>("session_exit", () => undefined);
+      const unlistenExit = await listen<SessionExit>("session_exit", (event) => {
+        if (event.payload.id === session.id) {
+          onExit(session.id);
+        }
+      });
       cleanupTasks.push(unlistenExit);
 
       fitAddon.fit();
@@ -116,7 +129,7 @@ function TerminalSurface({ active, session }: TerminalSurfaceProps) {
       }
 
       const inputDisposable = terminal.onData((data) => {
-        void invoke("write_to_session", { id: session.id, data });
+        void invoke("write_to_session", { id: session.id, data }).catch(() => undefined);
       });
       cleanupTasks.push(() => inputDisposable.dispose());
 
@@ -140,7 +153,7 @@ function TerminalSurface({ active, session }: TerminalSurfaceProps) {
       terminalRef.current = null;
       fitAddonRef.current = null;
     };
-  }, [session.id]);
+  }, [onExit, onOutput, session.id]);
 
   useEffect(() => {
     if (!active) {
@@ -179,12 +192,87 @@ export function TerminalPane() {
   const initialSession = useMemo<TerminalSession>(
     () => ({
       id: crypto.randomUUID(),
-      title: "shell"
+      title: "shell",
+      attention: "not_now",
+      lastOutputAt: null
     }),
     []
   );
   const [sessions, setSessions] = useState<TerminalSession[]>([initialSession]);
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      const now = Date.now();
+
+      setSessions((currentSessions) => {
+        let changed = false;
+        const nextSessions: TerminalSession[] = currentSessions.map((session) => {
+          if (
+            session.id === activeSessionId ||
+            session.lastOutputAt === null ||
+            now - session.lastOutputAt < quietThresholdMs ||
+            session.attention === "needs_you"
+          ) {
+            return session;
+          }
+
+          changed = true;
+          return {
+            ...session,
+            attention: "needs_you"
+          };
+        });
+
+        return changed ? nextSessions : currentSessions;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [activeSessionId]);
+
+  const activateSession = useCallback((sessionId: string) => {
+    setActiveSessionId(sessionId);
+    setSessions((currentSessions) =>
+      currentSessions.map((session) =>
+        session.id === sessionId
+          ? {
+              ...session,
+              attention: "not_now"
+            }
+          : session
+      )
+    );
+  }, []);
+
+  const handleSessionOutput = useCallback((sessionId: string) => {
+    const now = Date.now();
+
+    setSessions((currentSessions) =>
+      currentSessions.map((session) =>
+        session.id === sessionId
+          ? {
+              ...session,
+              attention: "not_now",
+              lastOutputAt: now
+            }
+          : session
+      )
+    );
+  }, []);
+
+  const handleSessionExit = useCallback((sessionId: string) => {
+    setSessions((currentSessions) =>
+      currentSessions.map((session) =>
+        session.id === sessionId
+          ? {
+              ...session,
+              attention: "needs_you"
+            }
+          : session
+      )
+    );
+  }, []);
 
   const createSession = () => {
     const index = nextTabIndex.current;
@@ -192,7 +280,9 @@ export function TerminalPane() {
 
     const session: TerminalSession = {
       id: crypto.randomUUID(),
-      title: `shell ${index}`
+      title: `shell ${index}`,
+      attention: "not_now",
+      lastOutputAt: null
     };
 
     setSessions((currentSessions) => [...currentSessions, session]);
@@ -207,7 +297,9 @@ export function TerminalPane() {
       if (remainingSessions.length === 0) {
         const session: TerminalSession = {
           id: crypto.randomUUID(),
-          title: "shell"
+          title: "shell",
+          attention: "not_now",
+          lastOutputAt: null
         };
         nextTabIndex.current = 2;
         setActiveSessionId(session.id);
@@ -237,9 +329,9 @@ export function TerminalPane() {
               role="tab"
               aria-selected={session.id === activeSessionId}
               className="tab-button"
-              onClick={() => setActiveSessionId(session.id)}
+              onClick={() => activateSession(session.id)}
             >
-              {session.title}
+              {session.title} · {session.attention}
             </button>
             <button
               type="button"
@@ -261,6 +353,8 @@ export function TerminalPane() {
           <TerminalSurface
             key={session.id}
             active={session.id === activeSessionId}
+            onExit={handleSessionExit}
+            onOutput={handleSessionOutput}
             session={session}
           />
         ))}
