@@ -3,12 +3,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
+import {
+  applyPokeUiTheme,
+  getCharacterTheme,
+  type CharacterId
+} from "./characterThemes";
 import "@xterm/xterm/css/xterm.css";
 
 type AttentionState = "not_now" | "needs_you";
 
 type Character = {
-  id: string;
+  id: CharacterId;
   name: string;
   iconSrc: string;
   idleSrc: string;
@@ -19,7 +24,7 @@ type TerminalSession = {
   id: string;
   title: string;
   attention: AttentionState;
-  characterId: string;
+  characterId: CharacterId;
   lastOutputAt: number | null;
 };
 
@@ -43,7 +48,7 @@ type TerminalSurfaceProps = {
 const quietThresholdMs = 5000;
 const skinBasePath = "/skins/default-poke-crew/characters";
 
-function spriteCharacter(id: string, name: string): Character {
+function spriteCharacter(id: CharacterId, name: string): Character {
   const basePath = `${skinBasePath}/${id}`;
 
   return {
@@ -82,27 +87,7 @@ function createTerminal() {
       'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
     fontSize: 14,
     lineHeight: 1.2,
-    theme: {
-      background: "#090b10",
-      foreground: "#e8edf5",
-      cursor: "#ffffff",
-      black: "#151922",
-      red: "#f7768e",
-      green: "#9ece6a",
-      yellow: "#e0af68",
-      blue: "#7aa2f7",
-      magenta: "#bb9af7",
-      cyan: "#7dcfff",
-      white: "#c0caf5",
-      brightBlack: "#414868",
-      brightRed: "#ff7a93",
-      brightGreen: "#b9f27c",
-      brightYellow: "#ffcf86",
-      brightBlue: "#8fb4ff",
-      brightMagenta: "#cba6ff",
-      brightCyan: "#9be8ff",
-      brightWhite: "#ffffff"
-    }
+    theme: getCharacterTheme(characters[0].id).theme.xterm
   });
 }
 
@@ -120,6 +105,7 @@ function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceP
 
     const terminal = createTerminal();
     const fitAddon = new FitAddon();
+    terminal.options.theme = getCharacterTheme(session.characterId).theme.xterm;
 
     terminalRef.current = terminal;
     fitAddonRef.current = fitAddon;
@@ -198,6 +184,14 @@ function TerminalSurface({ active, onExit, onOutput, session }: TerminalSurfaceP
   }, [onExit, onOutput, session.id]);
 
   useEffect(() => {
+    const terminal = terminalRef.current;
+
+    if (terminal) {
+      terminal.options.theme = getCharacterTheme(session.characterId).theme.xterm;
+    }
+  }, [session.characterId]);
+
+  useEffect(() => {
     if (!active) {
       return;
     }
@@ -244,6 +238,12 @@ export function TerminalPane() {
   const [sessions, setSessions] = useState<TerminalSession[]>([initialSession]);
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
+  const activeSession =
+    sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
+
+  useEffect(() => {
+    applyPokeUiTheme(getCharacterTheme(activeSession.characterId).theme.ui);
+  }, [activeSession.characterId]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -365,7 +365,7 @@ export function TerminalPane() {
     });
   };
 
-  const replaceCharacter = useCallback((sessionId: string, characterId: string) => {
+  const replaceCharacter = useCallback((sessionId: string, characterId: CharacterId) => {
     setSessions((currentSessions) =>
       currentSessions.map((session) =>
         session.id === sessionId
@@ -472,7 +472,7 @@ function CharacterPicker({
   sessions
 }: {
   onClose: () => void;
-  onSelect: (characterId: string) => void;
+  onSelect: (characterId: CharacterId) => void;
   session: TerminalSession;
   sessions: TerminalSession[];
 }) {

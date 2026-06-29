@@ -5,8 +5,22 @@
 }
 
 :root {
-  color: #f3f6fb;
-  background: #090b10;
+  --poke-app-bg: #15170f;
+  --poke-panel-bg: #1d2013;
+  --poke-tab-bg: #292e1a;
+  --poke-active-tab-bg: #202514;
+  --poke-active-tab-border: #d9f28b;
+  --poke-tab-hover-bg: #3b4526;
+  --poke-tab-text: #e8ebdd;
+  --poke-muted-text: #aeb8aa;
+  --poke-overlay-bg: #1d2013;
+  --poke-overlay-border: #d9f28b;
+  --poke-overlay-text: #e8ebdd;
+  --poke-overlay-disabled-text: #687066;
+  --poke-focus-ring: #d9f28b;
+  --poke-scrollbar-thumb: #3b4526;
+  color: var(--poke-tab-text);
+  background: var(--poke-app-bg);
   font-family:
     "Poke PixelMplus",
     "PixelMplus12",
@@ -40,7 +54,7 @@ body,
 }
 
 body {
-  background: #090b10;
+  background: var(--poke-app-bg);
 }
 
 .app-shell {
@@ -48,7 +62,7 @@ body {
   height: 100%;
   min-height: 100vh;
   padding: 0;
-  background: #090b10;
+  background: var(--poke-app-bg);
 }
 
 .terminal-workspace {
@@ -57,7 +71,7 @@ body {
   height: 100%;
   min-height: 100vh;
   grid-template-rows: 58px minmax(0, 1fr);
-  background: #090b10;
+  background: var(--poke-app-bg);
 }
 
 .tab-bar {
@@ -68,8 +82,8 @@ body {
   padding: 6px 8px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  border-bottom: 1px solid #27332b;
-  background: #192119;
+  border-bottom: 1px solid var(--poke-active-tab-border);
+  background: var(--poke-panel-bg);
 }
 
 .tab-item {
@@ -81,19 +95,19 @@ body {
   border: 1px solid transparent;
   border-bottom: 0;
   border-radius: 6px 6px 0 0;
-  color: #879586;
-  background: transparent;
+  color: var(--poke-muted-text);
+  background: var(--poke-tab-bg);
 }
 
 .tab-item[data-active="true"] {
-  color: #e1eadb;
-  border-color: #35463a;
-  background: #090b10;
+  color: var(--poke-tab-text);
+  border-color: var(--poke-active-tab-border);
+  background: var(--poke-active-tab-bg);
 }
 
 .tab-item:hover {
-  color: #c5d0c2;
-  background: #202a20;
+  color: var(--poke-tab-text);
+  background: var(--poke-tab-hover-bg);
 }
 
 .tab-button,
@@ -116,7 +130,7 @@ body {
 }
 
 .tab-character-button:focus-visible {
-  outline: 1px solid #b8c7aa;
+  outline: 1px solid var(--poke-focus-ring);
   outline-offset: -4px;
 }
 
@@ -133,7 +147,7 @@ body {
 .tab-close {
   width: 32px;
   flex: 0 0 32px;
-  color: #718071;
+  color: var(--poke-muted-text);
   font-size: 14px;
 }
 
@@ -141,7 +155,7 @@ body {
   width: 42px;
   height: 51px;
   flex: 0 0 42px;
-  color: #aebdab;
+  color: var(--poke-muted-text);
   font-size: 18px;
 }
 
@@ -149,7 +163,7 @@ body {
 .tab-character-button:hover,
 .tab-close:hover,
 .new-tab-button:hover {
-  background: rgba(255, 255, 255, 0.055);
+  background: var(--poke-tab-hover-bg);
 }
 
 .tab-name {
@@ -167,7 +181,7 @@ body {
   min-height: 0;
   padding: 10px;
   overflow: hidden;
-  background: #090b10;
+  background: var(--poke-app-bg);
 }
 
 .terminal-surface {
@@ -247,19 +261,19 @@ body {
 .character-picker {
   width: min(390px, 100%);
   padding: 14px;
-  color: #d9e4d1;
-  border: 3px double #a8b99d;
-  outline: 2px solid #233126;
-  background: #26362b;
+  color: var(--poke-overlay-text);
+  border: 3px double var(--poke-overlay-border);
+  outline: 2px solid var(--poke-panel-bg);
+  background: var(--poke-overlay-bg);
   box-shadow:
-    0 0 0 4px #101710,
+    0 0 0 4px var(--poke-app-bg),
     0 18px 50px rgba(0, 0, 0, 0.52);
 }
 
 .picker-title {
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #6e8068;
+  border-bottom: 1px solid var(--poke-overlay-border);
   font-size: 14px;
 }
 
@@ -277,18 +291,18 @@ body {
   gap: 8px;
   padding: 0 8px;
   border: 0;
-  color: #d9e4d1;
+  color: var(--poke-overlay-text);
   background: transparent;
   text-align: left;
   cursor: pointer;
 }
 
 .picker-highlighted {
-  background: #3b4d3e;
+  background: var(--poke-tab-hover-bg);
 }
 
 .picker-disabled {
-  color: #7f8c79;
+  color: var(--poke-overlay-disabled-text);
   cursor: not-allowed;
 }
 
@@ -311,6 +325,6 @@ body {
 }
 
 .picker-unavailable {
-  color: #9cac94;
+  color: var(--poke-muted-text);
   text-align: right;
 }
