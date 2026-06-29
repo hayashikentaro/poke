@@ -1,5 +1,5 @@
 export const appConfig = {
   terminal: {
-    fontSize: 16
+    fontSize: 18
   }
 } as const;
