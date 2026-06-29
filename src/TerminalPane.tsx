@@ -548,8 +548,8 @@ function CharacterPicker({
   }, [highlightedIndex, onClose, onSelect, usedByAnotherSession]);
 
   return (
-    <div className="picker-layer" aria-modal="true" role="dialog" aria-label="Change character">
-      <div className="character-picker">
+    <div className="picker-layer" aria-modal="true" role="dialog" aria-label="Change character" onMouseDown={onClose}>
+      <div className="character-picker" onMouseDown={(event) => event.stopPropagation()}>
         <div className="picker-header">
           <div className="picker-title">CHANGE CHARACTER</div>
           <button type="button" className="picker-close" aria-label="Close character picker" onClick={onClose}>
