@@ -82,7 +82,6 @@ body {
   padding: 6px 8px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  border-bottom: 1px solid var(--poke-active-tab-border);
   background: var(--poke-panel-bg);
 }
 
