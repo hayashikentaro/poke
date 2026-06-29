@@ -16,7 +16,7 @@ struct TerminalState {
 struct TerminalSession {
     writer: Arc<Mutex<Box<dyn Write + Send>>>,
     master: Box<dyn MasterPty + Send>,
-    child: Arc<Mutex<Box<dyn Child + Send>>>,
+    child: Arc<Mutex<Box<dyn Child + Send + Sync>>>,
 }
 
 #[derive(Clone, Serialize)]
