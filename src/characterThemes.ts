@@ -208,11 +208,11 @@ export const pokeCharacterThemes = {
     "primary": "#FFC979",
     "theme": {
       "xterm": {
-        "background": "#17140F",
+        "background": "#21180F",
         "foreground": "#F1E8D9",
         "cursor": "#FFC979",
-        "cursorAccent": "#17140F",
-        "selectionBackground": "#4B3824",
+        "cursorAccent": "#21180F",
+        "selectionBackground": "#5C4125",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -231,20 +231,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#17140F",
-        "panelBackground": "#201B13",
-        "tabBackground": "#2E261A",
-        "activeTabBackground": "#261F14",
+        "appBackground": "#21180F",
+        "panelBackground": "#2A2115",
+        "tabBackground": "#3A2B1A",
+        "activeTabBackground": "#322416",
         "activeTabBorder": "#FFC979",
-        "tabHoverBackground": "#4B3824",
+        "tabHoverBackground": "#5C4125",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#201B13",
+        "overlayBackground": "#2A2115",
         "overlayBorder": "#FFC979",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#FFC979",
-        "scrollbarThumb": "#4B3824"
+        "scrollbarThumb": "#5C4125"
       }
     }
   },
@@ -300,11 +300,11 @@ export const pokeCharacterThemes = {
     "primary": "#FFE066",
     "theme": {
       "xterm": {
-        "background": "#17160F",
+        "background": "#211F0F",
         "foreground": "#F2EFD9",
         "cursor": "#FFE066",
-        "cursorAccent": "#17160F",
-        "selectionBackground": "#4B4424",
+        "cursorAccent": "#211F0F",
+        "selectionBackground": "#5C5624",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -323,20 +323,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#17160F",
-        "panelBackground": "#201D13",
-        "tabBackground": "#2E2A1A",
-        "activeTabBackground": "#262214",
+        "appBackground": "#211F0F",
+        "panelBackground": "#2A2715",
+        "tabBackground": "#3A361A",
+        "activeTabBackground": "#322F16",
         "activeTabBorder": "#FFE066",
-        "tabHoverBackground": "#4B4424",
+        "tabHoverBackground": "#5C5624",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#201D13",
+        "overlayBackground": "#2A2715",
         "overlayBorder": "#FFE066",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#FFE066",
-        "scrollbarThumb": "#4B4424"
+        "scrollbarThumb": "#5C5624"
       }
     }
   },
