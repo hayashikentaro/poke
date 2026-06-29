@@ -10,6 +10,34 @@ Tabs, characters, AI, notifications, persistence, command palette, and settings 
 - Rust and Cargo
 - Platform-specific Tauri prerequisites for your operating system
 
+On macOS, verify the required tools first:
+
+```sh
+node --version
+npm --version
+cargo --version
+rustc --version
+xcode-select -p
+```
+
+If `cargo` or `rustc` is missing, install Rust:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+After installation, restart the terminal or load Cargo into the current shell:
+
+```sh
+source "$HOME/.cargo/env"
+```
+
+If `xcode-select -p` fails on macOS, install Apple's command line tools:
+
+```sh
+xcode-select --install
+```
+
 ## Install
 
 ```sh
@@ -23,6 +51,8 @@ npm run tauri dev
 ```
 
 This launches the Tauri desktop app and starts the frontend dev server that the app loads internally.
+
+If this fails with `failed to run 'cargo metadata'`, Cargo is not installed or is not on `PATH`. Run `cargo --version`; if it fails, install Rust using the command above.
 
 ## Verify Terminal Behavior
 
