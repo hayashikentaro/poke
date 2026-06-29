@@ -42,49 +42,74 @@ body {
   width: 100%;
   height: 100%;
   min-height: 100vh;
-  grid-template-rows: 36px minmax(0, 1fr);
+  grid-template-rows: 58px minmax(0, 1fr);
   background: #090b10;
 }
 
 .tab-bar {
   display: flex;
-  align-items: center;
-  gap: 1px;
+  align-items: end;
+  gap: 2px;
   min-width: 0;
+  padding: 6px 8px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  border-bottom: 1px solid #242936;
-  background: #11151d;
+  border-bottom: 1px solid #27332b;
+  background: #192119;
 }
 
 .tab-item {
   display: flex;
   align-items: center;
-  min-width: 112px;
-  max-width: 200px;
-  height: 100%;
-  border-right: 1px solid #242936;
-  background: #171c26;
+  min-width: 146px;
+  max-width: 220px;
+  height: 51px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  color: #879586;
+  background: transparent;
 }
 
 .tab-item[data-active="true"] {
+  color: #e1eadb;
+  border-color: #35463a;
   background: #090b10;
 }
 
+.tab-item:hover {
+  color: #c5d0c2;
+  background: #202a20;
+}
+
 .tab-button,
+.tab-character-button,
 .tab-close,
 .new-tab-button {
   height: 100%;
   border: 0;
-  color: #d7deeb;
+  color: inherit;
   background: transparent;
   font: inherit;
+}
+
+.tab-character-button {
+  width: 48px;
+  flex: 0 0 48px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.tab-character-button:focus-visible {
+  outline: 1px solid #b8c7aa;
+  outline-offset: -4px;
 }
 
 .tab-button {
   min-width: 0;
   flex: 1;
-  padding: 0 10px;
+  padding: 0 4px;
   overflow: hidden;
   text-align: left;
   text-overflow: ellipsis;
@@ -94,21 +119,31 @@ body {
 .tab-close {
   width: 32px;
   flex: 0 0 32px;
-  color: #8792a6;
+  color: #718071;
   font-size: 14px;
 }
 
 .new-tab-button {
-  width: 38px;
-  flex: 0 0 38px;
-  color: #b8c3d6;
+  width: 42px;
+  height: 51px;
+  flex: 0 0 42px;
+  color: #aebdab;
   font-size: 18px;
 }
 
 .tab-button:hover,
+.tab-character-button:hover,
 .tab-close:hover,
 .new-tab-button:hover {
-  background: #242936;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.tab-name {
+  display: block;
+  overflow: hidden;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .terminal-pane {
@@ -140,4 +175,128 @@ body {
 
 .terminal-surface .xterm-screen {
   width: 100%;
+}
+
+.character-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  flex: 0 0 32px;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+.sprite-icon {
+  background-image: var(--sprite-url);
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+
+.sprite-not_now {
+  animation: sprite-not-now 1.091s steps(6) infinite;
+}
+
+.sprite-needs_you {
+  animation: sprite-needs-you 1s steps(8) infinite;
+}
+
+@keyframes sprite-not-now {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -192px 0;
+  }
+}
+
+@keyframes sprite-needs-you {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -256px 0;
+  }
+}
+
+.picker-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(6, 10, 7, 0.32);
+}
+
+.character-picker {
+  width: min(390px, 100%);
+  padding: 14px;
+  color: #d9e4d1;
+  border: 3px double #a8b99d;
+  outline: 2px solid #233126;
+  background: #26362b;
+  box-shadow:
+    0 0 0 4px #101710,
+    0 18px 50px rgba(0, 0, 0, 0.52);
+}
+
+.picker-title {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #6e8068;
+  font-size: 14px;
+}
+
+.picker-list {
+  display: grid;
+  gap: 2px;
+}
+
+.picker-row {
+  width: 100%;
+  height: 38px;
+  display: grid;
+  grid-template-columns: 16px 22px 32px minmax(0, 1fr) 46px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  border: 0;
+  color: #d9e4d1;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.picker-highlighted {
+  background: #3b4d3e;
+}
+
+.picker-disabled {
+  color: #7f8c79;
+  cursor: not-allowed;
+}
+
+.picker-disabled .character-icon {
+  opacity: 0.42;
+}
+
+.picker-cursor,
+.picker-number,
+.picker-unavailable {
+  font-size: 12px;
+}
+
+.picker-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-unavailable {
+  color: #9cac94;
+  text-align: right;
 }

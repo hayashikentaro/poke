@@ -7,10 +7,19 @@ import "@xterm/xterm/css/xterm.css";
 
 type AttentionState = "not_now" | "needs_you";
 
+type Character = {
+  id: string;
+  name: string;
+  iconSrc: string;
+  idleSrc: string;
+  needsYouSrc: string;
+};
+
 type TerminalSession = {
   id: string;
   title: string;
   attention: AttentionState;
+  characterId: string;
   lastOutputAt: number | null;
 };
 
@@ -32,6 +41,39 @@ type TerminalSurfaceProps = {
 };
 
 const quietThresholdMs = 5000;
+const skinBasePath = "/skins/default-poke-crew/characters";
+
+function spriteCharacter(id: string, name: string): Character {
+  const basePath = `${skinBasePath}/${id}`;
+
+  return {
+    id,
+    name,
+    iconSrc: `${basePath}/icon_32x32.png`,
+    idleSrc: `${basePath}/idle_32x32_6f.png`,
+    needsYouSrc: `${basePath}/needs_you_32x32_8f.png`
+  };
+}
+
+const characters: Character[] = [
+  spriteCharacter("mugi", "Mugi"),
+  spriteCharacter("rune", "Rune"),
+  spriteCharacter("kiku", "Kiku"),
+  spriteCharacter("sora", "Sora"),
+  spriteCharacter("nagi", "Nagi"),
+  spriteCharacter("yuzu", "Yuzu"),
+  spriteCharacter("haru", "Haru"),
+  spriteCharacter("kiri", "Kiri")
+];
+
+function getCharacter(characterId: string) {
+  return characters.find((character) => character.id === characterId) ?? characters[0];
+}
+
+function getNextCharacterId(sessions: TerminalSession[]) {
+  const used = new Set(sessions.map((session) => session.characterId));
+  return characters.find((character) => !used.has(character.id))?.id ?? characters[sessions.length % characters.length].id;
+}
 
 function createTerminal() {
   return new Terminal({
@@ -194,12 +236,14 @@ export function TerminalPane() {
       id: crypto.randomUUID(),
       title: "shell",
       attention: "not_now",
+      characterId: characters[0].id,
       lastOutputAt: null
     }),
     []
   );
   const [sessions, setSessions] = useState<TerminalSession[]>([initialSession]);
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
+  const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -282,6 +326,7 @@ export function TerminalPane() {
       id: crypto.randomUUID(),
       title: `shell ${index}`,
       attention: "not_now",
+      characterId: getNextCharacterId(sessions),
       lastOutputAt: null
     };
 
@@ -299,6 +344,7 @@ export function TerminalPane() {
           id: crypto.randomUUID(),
           title: "shell",
           attention: "not_now",
+          characterId: characters[0].id,
           lastOutputAt: null
         };
         nextTabIndex.current = 2;
@@ -311,44 +357,84 @@ export function TerminalPane() {
         setActiveSessionId(remainingSessions[nextIndex].id);
       }
 
+      if (pickerSessionId === sessionId) {
+        setPickerSessionId(null);
+      }
+
       return remainingSessions;
     });
   };
 
+  const replaceCharacter = useCallback((sessionId: string, characterId: string) => {
+    setSessions((currentSessions) =>
+      currentSessions.map((session) =>
+        session.id === sessionId
+          ? {
+              ...session,
+              characterId
+            }
+          : session
+      )
+    );
+    setPickerSessionId(null);
+  }, []);
+
+  const pickerSession = sessions.find((session) => session.id === pickerSessionId) ?? null;
+
   return (
     <section className="terminal-workspace" aria-label="Terminal sessions">
       <div className="tab-bar" role="tablist" aria-label="Terminal tabs">
-        {sessions.map((session) => (
-          <div
-            key={session.id}
-            className="tab-item"
-            data-active={session.id === activeSessionId ? "true" : "false"}
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={session.id === activeSessionId}
-              className="tab-button"
-              onClick={() => activateSession(session.id)}
+        {sessions.map((session) => {
+          const character = getCharacter(session.characterId);
+
+          return (
+            <div
+              key={session.id}
+              className="tab-item"
+              data-active={session.id === activeSessionId ? "true" : "false"}
             >
-              {session.title} · {session.attention}
-            </button>
-            <button
-              type="button"
-              className="tab-close"
-              aria-label={`Close ${session.title}`}
-              onClick={() => closeSession(session.id)}
-            >
-              x
-            </button>
-          </div>
-        ))}
+              <button
+                type="button"
+                className="tab-character-button"
+                aria-label={`Change ${character.name}`}
+                onClick={() => setPickerSessionId(session.id)}
+              >
+                <CharacterIcon character={character} state={session.attention} />
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={session.id === activeSessionId}
+                className="tab-button"
+                onClick={() => activateSession(session.id)}
+              >
+                <span className="tab-name">{session.title}</span>
+              </button>
+              <button
+                type="button"
+                className="tab-close"
+                aria-label={`Close ${session.title}`}
+                onClick={() => closeSession(session.id)}
+              >
+                x
+              </button>
+            </div>
+          );
+        })}
         <button type="button" className="new-tab-button" aria-label="New tab" onClick={createSession}>
           +
         </button>
       </div>
 
       <div className="terminal-pane">
+        {pickerSession ? (
+          <CharacterPicker
+            session={pickerSession}
+            sessions={sessions}
+            onClose={() => setPickerSessionId(null)}
+            onSelect={(characterId) => replaceCharacter(pickerSession.id, characterId)}
+          />
+        ) : null}
         {sessions.map((session) => (
           <TerminalSurface
             key={session.id}
@@ -360,5 +446,119 @@ export function TerminalPane() {
         ))}
       </div>
     </section>
+  );
+}
+
+function CharacterIcon({ character, state }: { character: Character; state: AttentionState }) {
+  const src = state === "needs_you" ? character.needsYouSrc : character.idleSrc;
+
+  return (
+    <span
+      className={`character-icon sprite-icon sprite-${state}`}
+      style={
+        {
+          "--sprite-url": `url(${src})`
+        } as React.CSSProperties
+      }
+      aria-hidden="true"
+    />
+  );
+}
+
+function CharacterPicker({
+  onClose,
+  onSelect,
+  session,
+  sessions
+}: {
+  onClose: () => void;
+  onSelect: (characterId: string) => void;
+  session: TerminalSession;
+  sessions: TerminalSession[];
+}) {
+  const [highlightedIndex, setHighlightedIndex] = useState(
+    Math.max(0, characters.findIndex((character) => character.id === session.characterId))
+  );
+
+  const usedByAnotherSession = useMemo(
+    () =>
+      new Set(
+        sessions
+          .filter((candidateSession) => candidateSession.id !== session.id)
+          .map((candidateSession) => candidateSession.characterId)
+      ),
+    [session.id, sessions]
+  );
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setHighlightedIndex((index) => (index + 1) % characters.length);
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setHighlightedIndex((index) => (index - 1 + characters.length) % characters.length);
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const character = characters[highlightedIndex];
+        if (!usedByAnotherSession.has(character.id)) {
+          onSelect(character.id);
+        }
+      }
+
+      if (/^[1-8]$/.test(event.key)) {
+        event.preventDefault();
+        const character = characters[Number(event.key) - 1];
+        if (!usedByAnotherSession.has(character.id)) {
+          onSelect(character.id);
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [highlightedIndex, onClose, onSelect, usedByAnotherSession]);
+
+  return (
+    <div className="picker-layer" aria-modal="true" role="dialog" aria-label="Change character">
+      <div className="character-picker">
+        <div className="picker-title">CHANGE CHARACTER</div>
+        <div className="picker-list">
+          {characters.map((character, index) => {
+            const current = character.id === session.characterId;
+            const disabled = usedByAnotherSession.has(character.id);
+            const highlighted = index === highlightedIndex;
+
+            return (
+              <button
+                className={`picker-row ${highlighted ? "picker-highlighted" : ""} ${
+                  disabled ? "picker-disabled" : ""
+                }`}
+                key={character.id}
+                type="button"
+                disabled={disabled}
+                onMouseEnter={() => setHighlightedIndex(index)}
+                onClick={() => onSelect(character.id)}
+              >
+                <span className="picker-cursor">{current ? ">" : highlighted ? "." : " "}</span>
+                <span className="picker-number">{index + 1}</span>
+                <CharacterIcon character={character} state={session.attention} />
+                <span className="picker-name">{character.name}</span>
+                <span className="picker-unavailable">{disabled ? "USED" : ""}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
