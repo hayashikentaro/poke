@@ -75,7 +75,6 @@ const characters: Character[] = [
   spriteCharacter("kiri", "Kiri"),
   spriteCharacter("mika", "Mika"),
   spriteCharacter("rina", "Rina"),
-  spriteCharacter("sena", "Sena"),
   spriteCharacter("towa", "Towa"),
   spriteCharacter("riko", "Riko"),
   spriteCharacter("luka", "Luka"),

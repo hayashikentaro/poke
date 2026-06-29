@@ -13,7 +13,6 @@ export type CharacterId =
   | "kiri"
   | "mika"
   | "rina"
-  | "sena"
   | "towa"
   | "riko"
   | "luka"
@@ -530,52 +529,6 @@ export const pokeCharacterThemes = {
         "overlayDisabledText": "#687066",
         "focusRing": "#87C3F3",
         "scrollbarThumb": "#273A49"
-      }
-    }
-  },
-  "sena": {
-    "id": "sena",
-    "name": "Sena",
-    "primary": "#F5959B",
-    "theme": {
-      "xterm": {
-        "background": "#1E1516",
-        "foreground": "#EBE0E1",
-        "cursor": "#F5959B",
-        "cursorAccent": "#1E1516",
-        "selectionBackground": "#492729",
-        "black": "#151515",
-        "red": "#FF6B6B",
-        "green": "#A7F3A1",
-        "yellow": "#FFE082",
-        "blue": "#82AAFF",
-        "magenta": "#C792EA",
-        "cyan": "#89DDFF",
-        "white": "#EBE0E1",
-        "brightBlack": "#5F6660",
-        "brightRed": "#FF8A8A",
-        "brightGreen": "#B9F8B2",
-        "brightYellow": "#FFE9A8",
-        "brightBlue": "#A6BDFF",
-        "brightMagenta": "#D6A8FF",
-        "brightCyan": "#A7EAFF",
-        "brightWhite": "#FFFFFF"
-      },
-      "ui": {
-        "appBackground": "#1E1516",
-        "panelBackground": "#261D1D",
-        "tabBackground": "#342324",
-        "activeTabBackground": "#2A1D1E",
-        "activeTabBorder": "#F5959B",
-        "tabHoverBackground": "#492729",
-        "tabText": "#E8EBDD",
-        "mutedText": "#AEB8AA",
-        "overlayBackground": "#261D1D",
-        "overlayBorder": "#F5959B",
-        "overlayText": "#E8EBDD",
-        "overlayDisabledText": "#687066",
-        "focusRing": "#F5959B",
-        "scrollbarThumb": "#492729"
       }
     }
   },
