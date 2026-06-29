@@ -116,11 +116,11 @@ export const pokeCharacterThemes = {
     "primary": "#9EE7FF",
     "theme": {
       "xterm": {
-        "background": "#0F1517",
+        "background": "#111516",
         "foreground": "#E0F0F3",
         "cursor": "#9EE7FF",
-        "cursorAccent": "#0F1517",
-        "selectionBackground": "#24424B",
+        "cursorAccent": "#111516",
+        "selectionBackground": "#2D3F43",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -139,20 +139,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#0F1517",
-        "panelBackground": "#131D20",
-        "tabBackground": "#1A292E",
-        "activeTabBackground": "#142126",
+        "appBackground": "#111516",
+        "panelBackground": "#171D1F",
+        "tabBackground": "#202A2D",
+        "activeTabBackground": "#1A2325",
         "activeTabBorder": "#9EE7FF",
-        "tabHoverBackground": "#24424B",
+        "tabHoverBackground": "#2D3F43",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#131D20",
+        "overlayBackground": "#171D1F",
         "overlayBorder": "#9EE7FF",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#9EE7FF",
-        "scrollbarThumb": "#24424B"
+        "scrollbarThumb": "#2D3F43"
       }
     }
   },
@@ -162,11 +162,11 @@ export const pokeCharacterThemes = {
     "primary": "#FFB4D6",
     "theme": {
       "xterm": {
-        "background": "#170F13",
+        "background": "#171113",
         "foreground": "#F2E3EA",
         "cursor": "#FFB4D6",
-        "cursorAccent": "#170F13",
-        "selectionBackground": "#4B2436",
+        "cursorAccent": "#171113",
+        "selectionBackground": "#46313A",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -185,20 +185,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#170F13",
-        "panelBackground": "#201319",
-        "tabBackground": "#2E1A23",
-        "activeTabBackground": "#26141C",
+        "appBackground": "#171113",
+        "panelBackground": "#21191C",
+        "tabBackground": "#30252A",
+        "activeTabBackground": "#281E22",
         "activeTabBorder": "#FFB4D6",
-        "tabHoverBackground": "#4B2436",
+        "tabHoverBackground": "#46313A",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#201319",
+        "overlayBackground": "#21191C",
         "overlayBorder": "#FFB4D6",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#FFB4D6",
-        "scrollbarThumb": "#4B2436"
+        "scrollbarThumb": "#46313A"
       }
     }
   },
@@ -208,11 +208,11 @@ export const pokeCharacterThemes = {
     "primary": "#FFC979",
     "theme": {
       "xterm": {
-        "background": "#21180F",
+        "background": "#211910",
         "foreground": "#F1E8D9",
         "cursor": "#FFC979",
-        "cursorAccent": "#21180F",
-        "selectionBackground": "#5C4125",
+        "cursorAccent": "#211910",
+        "selectionBackground": "#55432B",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -231,20 +231,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#21180F",
-        "panelBackground": "#2A2115",
-        "tabBackground": "#3A2B1A",
-        "activeTabBackground": "#322416",
+        "appBackground": "#211910",
+        "panelBackground": "#2A2217",
+        "tabBackground": "#382D1E",
+        "activeTabBackground": "#302719",
         "activeTabBorder": "#FFC979",
-        "tabHoverBackground": "#5C4125",
+        "tabHoverBackground": "#55432B",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#2A2115",
+        "overlayBackground": "#2A2217",
         "overlayBorder": "#FFC979",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#FFC979",
-        "scrollbarThumb": "#5C4125"
+        "scrollbarThumb": "#55432B"
       }
     }
   },
@@ -254,11 +254,11 @@ export const pokeCharacterThemes = {
     "primary": "#BCA7FF",
     "theme": {
       "xterm": {
-        "background": "#110F17",
+        "background": "#121117",
         "foreground": "#E8E3F3",
         "cursor": "#BCA7FF",
-        "cursorAccent": "#110F17",
-        "selectionBackground": "#31284B",
+        "cursorAccent": "#121117",
+        "selectionBackground": "#363044",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -277,20 +277,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#110F17",
-        "panelBackground": "#161320",
-        "tabBackground": "#1E1A2E",
-        "activeTabBackground": "#1A1626",
+        "appBackground": "#121117",
+        "panelBackground": "#181720",
+        "tabBackground": "#23202E",
+        "activeTabBackground": "#1D1A26",
         "activeTabBorder": "#BCA7FF",
-        "tabHoverBackground": "#31284B",
+        "tabHoverBackground": "#363044",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#161320",
+        "overlayBackground": "#181720",
         "overlayBorder": "#BCA7FF",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#BCA7FF",
-        "scrollbarThumb": "#31284B"
+        "scrollbarThumb": "#363044"
       }
     }
   },
@@ -300,11 +300,11 @@ export const pokeCharacterThemes = {
     "primary": "#FFE066",
     "theme": {
       "xterm": {
-        "background": "#211F0F",
+        "background": "#212010",
         "foreground": "#F2EFD9",
         "cursor": "#FFE066",
-        "cursorAccent": "#211F0F",
-        "selectionBackground": "#5C5624",
+        "cursorAccent": "#212010",
+        "selectionBackground": "#55512B",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -323,20 +323,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#211F0F",
-        "panelBackground": "#2A2715",
-        "tabBackground": "#3A361A",
-        "activeTabBackground": "#322F16",
+        "appBackground": "#212010",
+        "panelBackground": "#2A2817",
+        "tabBackground": "#38351E",
+        "activeTabBackground": "#302D19",
         "activeTabBorder": "#FFE066",
-        "tabHoverBackground": "#5C5624",
+        "tabHoverBackground": "#55512B",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#2A2715",
+        "overlayBackground": "#2A2817",
         "overlayBorder": "#FFE066",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
         "focusRing": "#FFE066",
-        "scrollbarThumb": "#5C5624"
+        "scrollbarThumb": "#55512B"
       }
     }
   },
