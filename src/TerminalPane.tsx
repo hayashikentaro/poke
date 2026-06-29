@@ -387,13 +387,14 @@ export function TerminalPane() {
       <div className="tab-bar" role="tablist" aria-label="Terminal tabs">
         {sessions.map((session) => {
           const character = getCharacter(session.characterId);
+          const isActive = session.id === activeSessionId;
           const tabTheme = getCharacterTheme(session.characterId).theme.ui;
 
           return (
             <div
               key={session.id}
               className="tab-item"
-              data-active={session.id === activeSessionId ? "true" : "false"}
+              data-active={isActive ? "true" : "false"}
               style={
                 {
                   "--tab-bg": tabTheme.tabBackground,
@@ -409,14 +410,19 @@ export function TerminalPane() {
                 type="button"
                 className="tab-character-button"
                 aria-label={`Change ${character.name}`}
-                onClick={() => setPickerSessionId(session.id)}
+                disabled={!isActive}
+                onClick={() => {
+                  if (isActive) {
+                    setPickerSessionId(session.id);
+                  }
+                }}
               >
                 <CharacterIcon character={character} state={session.attention} />
               </button>
               <button
                 type="button"
                 role="tab"
-                aria-selected={session.id === activeSessionId}
+                aria-selected={isActive}
                 className="tab-button"
                 onClick={() => activateSession(session.id)}
               >
