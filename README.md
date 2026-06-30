@@ -125,27 +125,47 @@ While the app is running, use `Command + +` or `Command + -` to change the termi
 
 Development defaults live in `src/appConfig.ts`.
 
-## Character Image Overrides
+## Character Customization
 
-Poke creates character image override folders in the app config directory:
+Poke creates character customization folders in the app config directory:
 
 ```sh
 ~/Library/Application Support/com.poke.terminal/characters/
 ```
 
-To replace a character image, put PNG files in the matching character folder:
+To replace a built-in character image or metadata, put files in the matching character folder:
 
 ```text
 characters/
   kiri/
+    character.json
     icon_32x32.png
     idle_32x32_6f.png
     needs_you_32x32_8f.png
 ```
 
-Files are optional. If a file is missing, Poke uses the built-in image for that part.
+`character.json` can override the display name and colors:
 
-Restart the app after changing character image files.
+```json
+{
+  "name": "Kiri",
+  "primary": "#b36df2",
+  "terminalBackground": "#201326"
+}
+```
+
+For built-in characters, all files are optional. If a value or image is missing, Poke uses the built-in definition for that part.
+
+To add a new character, create a new folder under `characters/` with:
+
+- `character.json`
+- `icon_32x32.png`
+- `idle_32x32_6f.png`
+- `needs_you_32x32_8f.png`
+
+New character folders require all three PNG files before they appear in the app.
+
+Restart the app after changing character files manually.
 
 ## Frontend-only development
 

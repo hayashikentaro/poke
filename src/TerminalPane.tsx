@@ -44,17 +44,20 @@ type SessionExit = {
   code: number | null;
 };
 
-type CharacterImageOverride = {
+type ExternalCharacterDefinition = {
   id: CharacterId;
+  name: string | null;
+  primary: string | null;
+  terminalBackground: string | null;
   iconPath: string | null;
   idlePath: string | null;
   needsYouPath: string | null;
 };
 
-type CharacterImageOverrides = {
+type ExternalCharacterDefinitions = {
   configDir: string;
   charactersDir: string;
-  overrides: CharacterImageOverride[];
+  characters: ExternalCharacterDefinition[];
 };
 
 type DroppedFile = File & {
@@ -128,31 +131,115 @@ function createTerminal(config: AppConfig) {
   });
 }
 
-function withCharacterImageOverrides(
+function withExternalCharacterDefinitions(
   characters: Character[],
-  imageOverrides: CharacterImageOverrides
+  externalDefinitions: ExternalCharacterDefinitions
 ) {
-  const overridesById = new Map(imageOverrides.overrides.map((override) => [override.id, override]));
+  const definitionsById = new Map(externalDefinitions.characters.map((definition) => [definition.id, definition]));
   const cacheToken = encodeURIComponent(String(Date.now()));
+  const nextCharacters = characters.map((character) =>
+    mergeExternalCharacterDefinition(character, definitionsById.get(character.id), cacheToken)
+  );
+  const defaultIds = new Set(characters.map((character) => character.id));
 
-  return characters.map((character) => {
-    const override = overridesById.get(character.id);
-
-    if (!override) {
-      return character;
+  for (const definition of externalDefinitions.characters) {
+    if (defaultIds.has(definition.id)) {
+      continue;
     }
 
-    return {
-      ...character,
-      images: {
-        icon: override.iconPath ? `${convertFileSrc(override.iconPath)}?v=${cacheToken}` : character.images.icon,
-        idle: override.idlePath ? `${convertFileSrc(override.idlePath)}?v=${cacheToken}` : character.images.idle,
-        needsYou: override.needsYouPath
-          ? `${convertFileSrc(override.needsYouPath)}?v=${cacheToken}`
-          : character.images.needsYou
-      }
-    };
-  });
+    const externalCharacter = createExternalCharacter(definition, cacheToken);
+    if (externalCharacter) {
+      nextCharacters.push(externalCharacter);
+    }
+  }
+
+  return nextCharacters;
+}
+
+function mergeExternalCharacterDefinition(
+  character: Character,
+  definition: ExternalCharacterDefinition | undefined,
+  cacheToken: string
+) {
+  if (!definition) {
+    return character;
+  }
+
+  const primary = definition.primary ?? character.primary;
+  const terminalBackground = definition.terminalBackground;
+
+  return {
+    ...character,
+    name: definition.name ?? character.name,
+    primary,
+    images: mergeCharacterImages(character.images, definition, cacheToken),
+    theme: applyCharacterThemeOverrides(character.theme, primary, terminalBackground)
+  };
+}
+
+function createExternalCharacter(definition: ExternalCharacterDefinition, cacheToken: string): Character | null {
+  if (!definition.iconPath || !definition.idlePath || !definition.needsYouPath) {
+    return null;
+  }
+
+  const baseCharacter = defaultCharacters[0];
+  const primary = definition.primary ?? baseCharacter.primary;
+
+  return {
+    id: definition.id,
+    name: definition.name ?? definition.id,
+    primary,
+    images: {
+      icon: `${convertFileSrc(definition.iconPath)}?v=${cacheToken}`,
+      idle: `${convertFileSrc(definition.idlePath)}?v=${cacheToken}`,
+      needsYou: `${convertFileSrc(definition.needsYouPath)}?v=${cacheToken}`
+    },
+    theme: applyCharacterThemeOverrides(
+      baseCharacter.theme,
+      primary,
+      definition.terminalBackground ?? baseCharacter.theme.xterm.background
+    )
+  };
+}
+
+function mergeCharacterImages(
+  images: Character["images"],
+  definition: ExternalCharacterDefinition,
+  cacheToken: string
+) {
+  return {
+    icon: definition.iconPath ? `${convertFileSrc(definition.iconPath)}?v=${cacheToken}` : images.icon,
+    idle: definition.idlePath ? `${convertFileSrc(definition.idlePath)}?v=${cacheToken}` : images.idle,
+    needsYou: definition.needsYouPath
+      ? `${convertFileSrc(definition.needsYouPath)}?v=${cacheToken}`
+      : images.needsYou
+  };
+}
+
+function applyCharacterThemeOverrides(
+  theme: Character["theme"],
+  primary: string,
+  terminalBackground: string | null
+) {
+  const nextTerminalBackground = terminalBackground ?? theme.xterm.background;
+
+  return {
+    xterm: {
+      ...theme.xterm,
+      background: nextTerminalBackground,
+      cursor: primary,
+      cursorAccent: nextTerminalBackground
+    },
+    ui: {
+      ...theme.ui,
+      terminalBackground: nextTerminalBackground,
+      tabBackground: nextTerminalBackground,
+      activeTabBackground: nextTerminalBackground,
+      activeTabBorder: primary,
+      overlayBorder: primary,
+      focusRing: primary
+    }
+  };
 }
 
 function getDroppedFilePath(file: File) {
@@ -379,12 +466,12 @@ export function TerminalPane() {
   }, []);
 
   useEffect(() => {
-    void invoke<CharacterImageOverrides>("get_character_image_overrides")
-      .then((imageOverrides) => {
-        setCharacters(withCharacterImageOverrides(defaultCharacters, imageOverrides));
+    void invoke<ExternalCharacterDefinitions>("get_character_definitions")
+      .then((definitions) => {
+        setCharacters(withExternalCharacterDefinitions(defaultCharacters, definitions));
       })
       .catch((error: unknown) => {
-        console.error("Failed to load character image overrides", error);
+        console.error("Failed to load character definitions", error);
       });
   }, []);
 

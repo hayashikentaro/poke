@@ -1,7 +1,7 @@
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     env, fs,
     io::{Read, Write},
     path::PathBuf,
@@ -48,19 +48,31 @@ struct TerminalConfig {
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct CharacterImageOverrides {
+struct CharacterDefinitions {
     config_dir: String,
     characters_dir: String,
-    overrides: Vec<CharacterImageOverride>,
+    characters: Vec<CharacterDefinition>,
 }
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct CharacterImageOverride {
+struct CharacterDefinition {
     id: String,
+    name: Option<String>,
+    primary: Option<String>,
+    terminal_background: Option<String>,
     icon_path: Option<String>,
     idle_path: Option<String>,
     needs_you_path: Option<String>,
+}
+
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct CharacterDefinitionFile {
+    id: Option<String>,
+    name: Option<String>,
+    primary: Option<String>,
+    terminal_background: Option<String>,
 }
 
 const MIN_TERMINAL_FONT_SIZE: u16 = 10;
@@ -140,29 +152,69 @@ fn update_terminal_font_size(app: AppHandle, font_size: u16) -> Result<AppConfig
 }
 
 #[tauri::command]
-fn get_character_image_overrides(app: AppHandle) -> Result<CharacterImageOverrides, String> {
+fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, String> {
     let config_dir = app_config_dir(&app)?;
     let characters_dir = config_dir.join("characters");
     fs::create_dir_all(&characters_dir).map_err(|error| error.to_string())?;
 
-    let mut overrides = Vec::with_capacity(CHARACTER_ASSET_FILES.len());
+    let mut characters = Vec::new();
+    let mut seen_ids = HashSet::new();
 
     for (id, icon_file, idle_file, needs_you_file) in CHARACTER_ASSET_FILES {
         let character_dir = characters_dir.join(id);
         fs::create_dir_all(&character_dir).map_err(|error| error.to_string())?;
 
-        overrides.push(CharacterImageOverride {
-            id: id.to_string(),
-            icon_path: existing_image_path(character_dir.join(icon_file)),
-            idle_path: existing_image_path(character_dir.join(idle_file)),
-            needs_you_path: existing_image_path(character_dir.join(needs_you_file)),
-        });
+        if let Some(definition) = read_character_definition(
+            &character_dir,
+            id,
+            icon_file,
+            idle_file,
+            needs_you_file,
+            false,
+        ) {
+            seen_ids.insert(definition.id.clone());
+            characters.push(definition);
+        }
     }
 
-    Ok(CharacterImageOverrides {
+    for entry in fs::read_dir(&characters_dir).map_err(|error| error.to_string())? {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let character_dir = entry.path();
+
+        if !character_dir.is_dir() {
+            continue;
+        }
+
+        let folder_id = match character_dir.file_name().and_then(|name| name.to_str()) {
+            Some(folder_id) => folder_id,
+            None => continue,
+        };
+
+        if CHARACTER_ASSET_FILES
+            .iter()
+            .any(|(default_id, _, _, _)| *default_id == folder_id)
+        {
+            continue;
+        }
+
+        if let Some(definition) = read_character_definition(
+            &character_dir,
+            folder_id,
+            "icon_32x32.png",
+            "idle_32x32_6f.png",
+            "needs_you_32x32_8f.png",
+            true,
+        ) {
+            if seen_ids.insert(definition.id.clone()) {
+                characters.push(definition);
+            }
+        }
+    }
+
+    Ok(CharacterDefinitions {
         config_dir: config_dir.to_string_lossy().into_owned(),
         characters_dir: characters_dir.to_string_lossy().into_owned(),
-        overrides,
+        characters,
     })
 }
 
@@ -379,7 +431,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_app_config,
             update_terminal_font_size,
-            get_character_image_overrides,
+            get_character_definitions,
             stage_dropped_file,
             create_session,
             write_to_session,
@@ -453,6 +505,89 @@ fn existing_image_path(path: PathBuf) -> Option<String> {
     } else {
         None
     }
+}
+
+fn read_character_definition(
+    character_dir: &PathBuf,
+    fallback_id: &str,
+    icon_file: &str,
+    idle_file: &str,
+    needs_you_file: &str,
+    allow_metadata_id: bool,
+) -> Option<CharacterDefinition> {
+    let metadata = read_character_definition_file(character_dir.join("character.json"));
+    let metadata_id = if allow_metadata_id {
+        metadata
+            .as_ref()
+            .and_then(|metadata| metadata.id.as_deref())
+            .filter(|id| is_valid_character_id(id))
+    } else {
+        None
+    };
+    let id = metadata_id
+        .or_else(|| is_valid_character_id(fallback_id).then_some(fallback_id))?
+        .to_string();
+
+    Some(CharacterDefinition {
+        id,
+        name: metadata
+            .as_ref()
+            .and_then(|metadata| clean_optional_string(&metadata.name)),
+        primary: metadata
+            .as_ref()
+            .and_then(|metadata| clean_hex_color(&metadata.primary)),
+        terminal_background: metadata
+            .as_ref()
+            .and_then(|metadata| clean_hex_color(&metadata.terminal_background)),
+        icon_path: existing_image_path(character_dir.join(icon_file)),
+        idle_path: existing_image_path(character_dir.join(idle_file)),
+        needs_you_path: existing_image_path(character_dir.join(needs_you_file)),
+    })
+}
+
+fn read_character_definition_file(path: PathBuf) -> Option<CharacterDefinitionFile> {
+    let text = fs::read_to_string(path).ok()?;
+    serde_json::from_str(&text).ok()
+}
+
+fn clean_optional_string(value: &Option<String>) -> Option<String> {
+    let value = value.as_ref()?.trim();
+
+    if value.is_empty() {
+        None
+    } else {
+        Some(value.to_string())
+    }
+}
+
+fn clean_hex_color(value: &Option<String>) -> Option<String> {
+    let value = value.as_ref()?.trim();
+
+    if is_hex_color(value) {
+        Some(value.to_string())
+    } else {
+        None
+    }
+}
+
+fn is_hex_color(value: &str) -> bool {
+    value.len() == 7
+        && value.starts_with('#')
+        && value
+            .chars()
+            .skip(1)
+            .all(|character| character.is_ascii_hexdigit())
+}
+
+fn is_valid_character_id(id: &str) -> bool {
+    !id.is_empty()
+        && id.len() <= 32
+        && id.chars().all(|character| {
+            character.is_ascii_lowercase()
+                || character.is_ascii_digit()
+                || character == '-'
+                || character == '_'
+        })
 }
 
 fn write_default_app_config(config_path: &PathBuf, config: &AppConfig) -> Result<(), String> {
