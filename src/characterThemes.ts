@@ -70,10 +70,10 @@ export const pokeCharacterThemes = {
     "primary": "#D9F28B",
     "theme": {
       "xterm": {
-        "background": "#15170F",
+        "background": "#1D2015",
         "foreground": "#EEF2DF",
         "cursor": "#D9F28B",
-        "cursorAccent": "#15170F",
+        "cursorAccent": "#1D2015",
         "selectionBackground": "#3B4526",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -116,10 +116,10 @@ export const pokeCharacterThemes = {
     "primary": "#9EE7FF",
     "theme": {
       "xterm": {
-        "background": "#111516",
+        "background": "#181D1F",
         "foreground": "#E0F0F3",
         "cursor": "#9EE7FF",
-        "cursorAccent": "#111516",
+        "cursorAccent": "#181D1F",
         "selectionBackground": "#2D3F43",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -162,10 +162,10 @@ export const pokeCharacterThemes = {
     "primary": "#FFB4D6",
     "theme": {
       "xterm": {
-        "background": "#171113",
+        "background": "#21191C",
         "foreground": "#F2E3EA",
         "cursor": "#FFB4D6",
-        "cursorAccent": "#171113",
+        "cursorAccent": "#21191C",
         "selectionBackground": "#46313A",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -208,10 +208,10 @@ export const pokeCharacterThemes = {
     "primary": "#FFC979",
     "theme": {
       "xterm": {
-        "background": "#211910",
+        "background": "#2A2116",
         "foreground": "#F1E8D9",
         "cursor": "#FFC979",
-        "cursorAccent": "#211910",
+        "cursorAccent": "#2A2116",
         "selectionBackground": "#55432B",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -254,10 +254,10 @@ export const pokeCharacterThemes = {
     "primary": "#BCA7FF",
     "theme": {
       "xterm": {
-        "background": "#121117",
+        "background": "#1A1821",
         "foreground": "#E8E3F3",
         "cursor": "#BCA7FF",
-        "cursorAccent": "#121117",
+        "cursorAccent": "#1A1821",
         "selectionBackground": "#363044",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -300,10 +300,10 @@ export const pokeCharacterThemes = {
     "primary": "#FFE066",
     "theme": {
       "xterm": {
-        "background": "#212010",
+        "background": "#2A2816",
         "foreground": "#F2EFD9",
         "cursor": "#FFE066",
-        "cursorAccent": "#212010",
+        "cursorAccent": "#2A2816",
         "selectionBackground": "#55512B",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -346,10 +346,10 @@ export const pokeCharacterThemes = {
     "primary": "#98F5C4",
     "theme": {
       "xterm": {
-        "background": "#0F1713",
+        "background": "#16221B",
         "foreground": "#DDF1E7",
         "cursor": "#98F5C4",
-        "cursorAccent": "#0F1713",
+        "cursorAccent": "#16221B",
         "selectionBackground": "#244B36",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -392,10 +392,10 @@ export const pokeCharacterThemes = {
     "primary": "#D49BFF",
     "theme": {
       "xterm": {
-        "background": "#18111C",
+        "background": "#211827",
         "foreground": "#ECE2F0",
         "cursor": "#D49BFF",
-        "cursorAccent": "#18111C",
+        "cursorAccent": "#211827",
         "selectionBackground": "#463255",
         "black": "#151515",
         "red": "#FF6B6B",
