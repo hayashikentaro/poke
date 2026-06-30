@@ -389,14 +389,14 @@ export const pokeCharacterThemes = {
   "kiri": {
     "id": "kiri",
     "name": "Kiri",
-    "primary": "#F5F0E6",
+    "primary": "#C77CFF",
     "theme": {
       "xterm": {
-        "background": "#17150F",
-        "foreground": "#F0E9DD",
-        "cursor": "#F5F0E6",
-        "cursorAccent": "#17150F",
-        "selectionBackground": "#4B3D24",
+        "background": "#17101C",
+        "foreground": "#E9E0EF",
+        "cursor": "#C77CFF",
+        "cursorAccent": "#17101C",
+        "selectionBackground": "#3D294B",
         "black": "#151515",
         "red": "#FF6B6B",
         "green": "#A7F3A1",
@@ -404,7 +404,7 @@ export const pokeCharacterThemes = {
         "blue": "#82AAFF",
         "magenta": "#C792EA",
         "cyan": "#89DDFF",
-        "white": "#F0E9DD",
+        "white": "#E9E0EF",
         "brightBlack": "#5F6660",
         "brightRed": "#FF8A8A",
         "brightGreen": "#B9F8B2",
@@ -415,20 +415,20 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "appBackground": "#17150F",
-        "panelBackground": "#201C13",
-        "tabBackground": "#2E271A",
-        "activeTabBackground": "#262114",
-        "activeTabBorder": "#F5F0E6",
-        "tabHoverBackground": "#4B3D24",
+        "appBackground": "#17101C",
+        "panelBackground": "#201826",
+        "tabBackground": "#2B2134",
+        "activeTabBackground": "#241D2B",
+        "activeTabBorder": "#C77CFF",
+        "tabHoverBackground": "#3D294B",
         "tabText": "#E8EBDD",
         "mutedText": "#AEB8AA",
-        "overlayBackground": "#201C13",
-        "overlayBorder": "#F5F0E6",
+        "overlayBackground": "#201826",
+        "overlayBorder": "#C77CFF",
         "overlayText": "#E8EBDD",
         "overlayDisabledText": "#687066",
-        "focusRing": "#F5F0E6",
-        "scrollbarThumb": "#4B3D24"
+        "focusRing": "#C77CFF",
+        "scrollbarThumb": "#3D294B"
       }
     }
   }
