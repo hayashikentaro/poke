@@ -5,8 +5,9 @@ import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import {
   applyPokeUiTheme,
-  getCharacterTheme,
-  type CharacterId
+  pokeCharacterThemes,
+  type CharacterId,
+  type PokeCharacterTheme
 } from "./characterThemes";
 import { defaultAppConfig, type AppConfig } from "./appConfig";
 import "@xterm/xterm/css/xterm.css";
@@ -16,9 +17,13 @@ type AttentionState = "not_now" | "needs_you";
 type Character = {
   id: CharacterId;
   name: string;
-  iconSrc: string;
-  idleSrc: string;
-  needsYouSrc: string;
+  primary: string;
+  images: {
+    icon: string;
+    idle: string;
+    needsYou: string;
+  };
+  theme: PokeCharacterTheme["theme"];
 };
 
 type TerminalSession = {
@@ -58,6 +63,7 @@ type DroppedFile = File & {
 
 type TerminalSurfaceProps = {
   active: boolean;
+  character: Character;
   config: AppConfig;
   onExit: (sessionId: string) => void;
   onOutput: (sessionId: string) => void;
@@ -70,27 +76,32 @@ const skinBasePath = "/skins/default-poke-crew/characters";
 const minTerminalFontSize = 10;
 const maxTerminalFontSize = 32;
 
-function spriteCharacter(id: CharacterId, name: string): Character {
+function spriteCharacter(id: CharacterId): Character {
   const basePath = `${skinBasePath}/${id}`;
+  const characterTheme = pokeCharacterThemes[id] ?? pokeCharacterThemes.mugi;
 
   return {
     id,
-    name,
-    iconSrc: `${basePath}/icon_32x32.png`,
-    idleSrc: `${basePath}/idle_32x32_6f.png`,
-    needsYouSrc: `${basePath}/needs_you_32x32_8f.png`
+    name: characterTheme.name,
+    primary: characterTheme.primary,
+    images: {
+      icon: `${basePath}/icon_32x32.png`,
+      idle: `${basePath}/idle_32x32_6f.png`,
+      needsYou: `${basePath}/needs_you_32x32_8f.png`
+    },
+    theme: characterTheme.theme
   };
 }
 
 const defaultCharacters: Character[] = [
-  spriteCharacter("mugi", "Mugi"),
-  spriteCharacter("rune", "Rune"),
-  spriteCharacter("kiku", "Kiku"),
-  spriteCharacter("sora", "Sora"),
-  spriteCharacter("nagi", "Nagi"),
-  spriteCharacter("yuzu", "Yuzu"),
-  spriteCharacter("haru", "Haru"),
-  spriteCharacter("kiri", "Kiri")
+  spriteCharacter("mugi"),
+  spriteCharacter("rune"),
+  spriteCharacter("kiku"),
+  spriteCharacter("sora"),
+  spriteCharacter("nagi"),
+  spriteCharacter("yuzu"),
+  spriteCharacter("haru"),
+  spriteCharacter("kiri")
 ];
 
 function getCharacter(characterId: string, characters: Character[]) {
@@ -113,7 +124,7 @@ function createTerminal(config: AppConfig) {
     fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", monospace',
     fontSize: config.terminal.fontSize,
     lineHeight: 1.2,
-    theme: getCharacterTheme(defaultCharacters[0].id).theme.xterm
+    theme: defaultCharacters[0].theme.xterm
   });
 }
 
@@ -133,11 +144,13 @@ function withCharacterImageOverrides(
 
     return {
       ...character,
-      iconSrc: override.iconPath ? `${convertFileSrc(override.iconPath)}?v=${cacheToken}` : character.iconSrc,
-      idleSrc: override.idlePath ? `${convertFileSrc(override.idlePath)}?v=${cacheToken}` : character.idleSrc,
-      needsYouSrc: override.needsYouPath
-        ? `${convertFileSrc(override.needsYouPath)}?v=${cacheToken}`
-        : character.needsYouSrc
+      images: {
+        icon: override.iconPath ? `${convertFileSrc(override.iconPath)}?v=${cacheToken}` : character.images.icon,
+        idle: override.idlePath ? `${convertFileSrc(override.idlePath)}?v=${cacheToken}` : character.images.idle,
+        needsYou: override.needsYouPath
+          ? `${convertFileSrc(override.needsYouPath)}?v=${cacheToken}`
+          : character.images.needsYou
+      }
     };
   });
 }
@@ -167,6 +180,7 @@ async function stageDroppedFile(file: File) {
 
 function TerminalSurface({
   active,
+  character,
   config,
   onExit,
   onOutput,
@@ -186,7 +200,7 @@ function TerminalSurface({
 
     const terminal = createTerminal(config);
     const fitAddon = new FitAddon();
-    terminal.options.theme = getCharacterTheme(session.characterId).theme.xterm;
+    terminal.options.theme = character.theme.xterm;
 
     terminalRef.current = terminal;
     fitAddonRef.current = fitAddon;
@@ -264,7 +278,7 @@ function TerminalSurface({
       fitAddonRef.current = null;
       onTerminalReady(session.id, null);
     };
-  }, [onExit, onOutput, onTerminalReady, session.id]);
+  }, [character.theme.xterm, onExit, onOutput, onTerminalReady, session.id]);
 
   useEffect(() => {
     const terminal = terminalRef.current;
@@ -289,9 +303,9 @@ function TerminalSurface({
     const terminal = terminalRef.current;
 
     if (terminal) {
-      terminal.options.theme = getCharacterTheme(session.characterId).theme.xterm;
+      terminal.options.theme = character.theme.xterm;
     }
-  }, [session.characterId]);
+  }, [character.theme.xterm]);
 
   useEffect(() => {
     if (!active) {
@@ -346,6 +360,7 @@ export function TerminalPane() {
   const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
+  const activeCharacter = getCharacter(activeSession.characterId, characters);
 
   const handleTerminalReady = useCallback((sessionId: string, terminal: Terminal | null) => {
     if (terminal) {
@@ -413,8 +428,8 @@ export function TerminalPane() {
   }, [config.terminal.fontSize, updateTerminalFontSize]);
 
   useEffect(() => {
-    applyPokeUiTheme(getCharacterTheme(activeSession.characterId).theme.ui);
-  }, [activeSession.characterId]);
+    applyPokeUiTheme(activeCharacter.theme.ui);
+  }, [activeCharacter.theme.ui]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -627,7 +642,7 @@ export function TerminalPane() {
         {sessions.map((session) => {
           const character = getCharacter(session.characterId, characters);
           const isActive = session.id === activeSessionId;
-          const tabTheme = getCharacterTheme(session.characterId).theme.ui;
+          const tabTheme = character.theme.ui;
 
           return (
             <div
@@ -730,6 +745,7 @@ export function TerminalPane() {
           <TerminalSurface
             key={session.id}
             active={session.id === activeSessionId}
+            character={getCharacter(session.characterId, characters)}
             config={config}
             onExit={handleSessionExit}
             onOutput={handleSessionOutput}
@@ -743,7 +759,7 @@ export function TerminalPane() {
 }
 
 function CharacterIcon({ character, state }: { character: Character; state: AttentionState }) {
-  const src = state === "needs_you" ? character.needsYouSrc : character.idleSrc;
+  const src = state === "needs_you" ? character.images.needsYou : character.images.idle;
 
   return (
     <span

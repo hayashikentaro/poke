@@ -2,15 +2,7 @@
 // Generated from the 32px flat no-outline character pack.
 // ANSI colors are intentionally shared across characters to preserve terminal semantics.
 
-export type CharacterId =
-  | "mugi"
-  | "rune"
-  | "kiku"
-  | "sora"
-  | "nagi"
-  | "yuzu"
-  | "haru"
-  | "kiri";
+export type CharacterId = string;
 
 export type PokeXtermTheme = {
   background: string;
@@ -64,7 +56,7 @@ export type PokeCharacterTheme = {
   };
 };
 
-export const pokeCharacterThemes = {
+export const pokeCharacterThemes: Record<string, PokeCharacterTheme> = {
   "mugi": {
     "id": "mugi",
     "name": "Mugi",
@@ -443,10 +435,10 @@ export const pokeCharacterThemes = {
   }
 
 
-} as const satisfies Record<CharacterId, PokeCharacterTheme>;
+};
 
 export function getCharacterTheme(characterId: CharacterId): PokeCharacterTheme {
-  return pokeCharacterThemes[characterId];
+  return pokeCharacterThemes[characterId] ?? pokeCharacterThemes.mugi;
 }
 
 export function applyPokeUiTheme(theme: PokeUiTheme, root: HTMLElement = document.documentElement): void {
