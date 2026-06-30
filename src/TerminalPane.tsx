@@ -49,6 +49,7 @@ type ExternalCharacterDefinition = {
   name: string | null;
   primary: string | null;
   terminalBackground: string | null;
+  loadError: string | null;
   iconPath: string | null;
   idlePath: string | null;
   needsYouPath: string | null;
@@ -177,11 +178,7 @@ function mergeExternalCharacterDefinition(
   };
 }
 
-function createExternalCharacter(definition: ExternalCharacterDefinition, cacheToken: string): Character | null {
-  if (!definition.iconPath || !definition.idlePath || !definition.needsYouPath) {
-    return null;
-  }
-
+function createExternalCharacter(definition: ExternalCharacterDefinition, cacheToken: string): Character {
   const baseCharacter = defaultCharacters[0];
   const primary = definition.primary ?? baseCharacter.primary;
 
@@ -190,9 +187,15 @@ function createExternalCharacter(definition: ExternalCharacterDefinition, cacheT
     name: definition.name ?? definition.id,
     primary,
     images: {
-      icon: `${convertFileSrc(definition.iconPath)}?v=${cacheToken}`,
-      idle: `${convertFileSrc(definition.idlePath)}?v=${cacheToken}`,
-      needsYou: `${convertFileSrc(definition.needsYouPath)}?v=${cacheToken}`
+      icon: definition.iconPath
+        ? `${convertFileSrc(definition.iconPath)}?v=${cacheToken}`
+        : baseCharacter.images.icon,
+      idle: definition.idlePath
+        ? `${convertFileSrc(definition.idlePath)}?v=${cacheToken}`
+        : baseCharacter.images.idle,
+      needsYou: definition.needsYouPath
+        ? `${convertFileSrc(definition.needsYouPath)}?v=${cacheToken}`
+        : baseCharacter.images.needsYou
     },
     theme: applyCharacterThemeOverrides(
       baseCharacter.theme,

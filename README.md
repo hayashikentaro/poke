@@ -165,9 +165,19 @@ To add a new character, create a new folder under `characters/` with:
 - `idle_32x32_6f.png`
 - `needs_you_32x32_8f.png`
 
-New character folders require all three PNG files before they appear in the app.
+New character folders can omit PNG files. Missing images use the built-in fallback character images.
 
 Restart the app after changing character files manually.
+
+Poke also creates a load-failure character setting:
+
+```text
+characters/
+  _load_failed/
+    character.json
+```
+
+This setting is used when an external character folder cannot be read as a normal character. If multiple folders fail to load, Poke creates separate runtime entries such as `load-failed-1` and `load-failed-2` so each failed folder remains visible instead of collapsing into one character.
 
 ## Frontend-only development
 

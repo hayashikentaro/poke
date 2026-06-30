@@ -61,6 +61,7 @@ struct CharacterDefinition {
     name: Option<String>,
     primary: Option<String>,
     terminal_background: Option<String>,
+    load_error: Option<String>,
     icon_path: Option<String>,
     idle_path: Option<String>,
     needs_you_path: Option<String>,
@@ -90,6 +91,10 @@ const MAX_TERMINAL_FONT_SIZE: u16 = 32;
 const DEFAULT_CHARACTER_ICON_FILE: &str = "icon_32x32.png";
 const DEFAULT_CHARACTER_IDLE_FILE: &str = "idle_32x32_6f.png";
 const DEFAULT_CHARACTER_NEEDS_YOU_FILE: &str = "needs_you_32x32_8f.png";
+const LOAD_FAILED_CHARACTER_DIR: &str = "_load_failed";
+const LOAD_FAILED_CHARACTER_NAME: &str = "Load Failed";
+const LOAD_FAILED_CHARACTER_PRIMARY: &str = "#FF6B6B";
+const LOAD_FAILED_CHARACTER_BACKGROUND: &str = "#281316";
 const BUILT_IN_CHARACTERS: [BuiltInCharacter; 8] = [
     BuiltInCharacter {
         id: "mugi",
@@ -196,6 +201,8 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
 
     let mut characters = Vec::new();
     let mut seen_ids = HashSet::new();
+    let mut failed_definition_index = 1;
+    let load_failed_definition = ensure_load_failed_character_definition(&characters_dir)?;
 
     for character in BUILT_IN_CHARACTERS {
         let character_dir = characters_dir.join(character.id);
@@ -228,6 +235,10 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
             None => continue,
         };
 
+        if folder_id == LOAD_FAILED_CHARACTER_DIR {
+            continue;
+        }
+
         if BUILT_IN_CHARACTERS
             .iter()
             .any(|character| character.id == folder_id)
@@ -243,6 +254,17 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
             DEFAULT_CHARACTER_NEEDS_YOU_FILE,
             true,
         ) {
+            if seen_ids.insert(definition.id.clone()) {
+                characters.push(definition);
+            }
+        } else {
+            let definition = create_load_failed_character_definition(
+                folder_id,
+                failed_definition_index,
+                &load_failed_definition,
+            );
+            failed_definition_index += 1;
+
             if seen_ids.insert(definition.id.clone()) {
                 characters.push(definition);
             }
@@ -566,6 +588,62 @@ fn ensure_default_character_definition(
     fs::write(definition_path, format!("{definition_text}\n")).map_err(|error| error.to_string())
 }
 
+fn ensure_load_failed_character_definition(
+    characters_dir: &PathBuf,
+) -> Result<CharacterDefinitionFile, String> {
+    let character_dir = characters_dir.join(LOAD_FAILED_CHARACTER_DIR);
+    fs::create_dir_all(&character_dir).map_err(|error| error.to_string())?;
+
+    let definition_path = character_dir.join("character.json");
+    if !definition_path.exists() {
+        let definition = CharacterDefinitionFile {
+            id: Some("load-failed".to_string()),
+            name: Some(LOAD_FAILED_CHARACTER_NAME.to_string()),
+            primary: Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string()),
+            terminal_background: Some(LOAD_FAILED_CHARACTER_BACKGROUND.to_string()),
+        };
+        let definition_text =
+            serde_json::to_string_pretty(&definition).map_err(|error| error.to_string())?;
+        fs::write(&definition_path, format!("{definition_text}\n"))
+            .map_err(|error| error.to_string())?;
+    }
+
+    Ok(
+        read_character_definition_file(&definition_path).unwrap_or(CharacterDefinitionFile {
+            id: Some("load-failed".to_string()),
+            name: Some(LOAD_FAILED_CHARACTER_NAME.to_string()),
+            primary: Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string()),
+            terminal_background: Some(LOAD_FAILED_CHARACTER_BACKGROUND.to_string()),
+        }),
+    )
+}
+
+fn create_load_failed_character_definition(
+    folder_id: &str,
+    index: usize,
+    load_failed_definition: &CharacterDefinitionFile,
+) -> CharacterDefinition {
+    let fallback_id = clean_optional_string(&load_failed_definition.id)
+        .filter(|id| is_valid_character_id(id))
+        .unwrap_or_else(|| "load-failed".to_string());
+    let id = format!("{fallback_id}-{index}");
+    let name = clean_optional_string(&load_failed_definition.name)
+        .unwrap_or_else(|| LOAD_FAILED_CHARACTER_NAME.to_string());
+
+    CharacterDefinition {
+        id,
+        name: Some(format!("{name} {index}")),
+        primary: clean_hex_color(&load_failed_definition.primary)
+            .or_else(|| Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string())),
+        terminal_background: clean_hex_color(&load_failed_definition.terminal_background)
+            .or_else(|| Some(LOAD_FAILED_CHARACTER_BACKGROUND.to_string())),
+        load_error: Some(format!("Failed to load character folder: {folder_id}")),
+        icon_path: None,
+        idle_path: None,
+        needs_you_path: None,
+    }
+}
+
 fn read_character_definition(
     character_dir: &PathBuf,
     fallback_id: &str,
@@ -574,7 +652,12 @@ fn read_character_definition(
     needs_you_file: &str,
     allow_metadata_id: bool,
 ) -> Option<CharacterDefinition> {
-    let metadata = read_character_definition_file(character_dir.join("character.json"));
+    let metadata = read_character_definition_file(&character_dir.join("character.json"));
+
+    if allow_metadata_id && metadata.is_none() {
+        return None;
+    }
+
     let metadata_id = if allow_metadata_id {
         metadata
             .as_ref()
@@ -598,13 +681,14 @@ fn read_character_definition(
         terminal_background: metadata
             .as_ref()
             .and_then(|metadata| clean_hex_color(&metadata.terminal_background)),
+        load_error: None,
         icon_path: existing_image_path(character_dir.join(icon_file)),
         idle_path: existing_image_path(character_dir.join(idle_file)),
         needs_you_path: existing_image_path(character_dir.join(needs_you_file)),
     })
 }
 
-fn read_character_definition_file(path: PathBuf) -> Option<CharacterDefinitionFile> {
+fn read_character_definition_file(path: &PathBuf) -> Option<CharacterDefinitionFile> {
     let text = fs::read_to_string(path).ok()?;
     serde_json::from_str(&text).ok()
 }
