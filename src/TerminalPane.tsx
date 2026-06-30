@@ -72,15 +72,7 @@ const characters: Character[] = [
   spriteCharacter("nagi", "Nagi"),
   spriteCharacter("yuzu", "Yuzu"),
   spriteCharacter("haru", "Haru"),
-  spriteCharacter("kiri", "Kiri"),
-  spriteCharacter("mika", "Mika"),
-  spriteCharacter("rina", "Rina"),
-  spriteCharacter("towa", "Towa"),
-  spriteCharacter("riko", "Riko"),
-  spriteCharacter("luka", "Luka"),
-  spriteCharacter("nina", "Nina"),
-  spriteCharacter("tomo", "Tomo"),
-  spriteCharacter("kana", "Kana")
+  spriteCharacter("kiri", "Kiri")
 ];
 
 function getCharacter(characterId: string) {
