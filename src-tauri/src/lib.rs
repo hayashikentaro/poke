@@ -92,9 +92,10 @@ const DEFAULT_CHARACTER_ICON_FILE: &str = "icon_32x32.png";
 const DEFAULT_CHARACTER_IDLE_FILE: &str = "idle_32x32_6f.png";
 const DEFAULT_CHARACTER_NEEDS_YOU_FILE: &str = "needs_you_32x32_8f.png";
 const LOAD_FAILED_CHARACTER_DIR: &str = "_load_failed";
-const LOAD_FAILED_CHARACTER_NAME: &str = "Load Failed";
-const LOAD_FAILED_CHARACTER_PRIMARY: &str = "#FF6B6B";
-const LOAD_FAILED_CHARACTER_BACKGROUND: &str = "#281316";
+const LOAD_FAILED_CHARACTER_ID: &str = "void";
+const LOAD_FAILED_CHARACTER_NAME: &str = "Void";
+const LOAD_FAILED_CHARACTER_PRIMARY: &str = "#60D9F5";
+const LOAD_FAILED_CHARACTER_BACKGROUND: &str = "#102027";
 const BUILT_IN_CHARACTERS: [BuiltInCharacter; 8] = [
     BuiltInCharacter {
         id: "mugi",
@@ -258,15 +259,18 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
                 characters.push(definition);
             }
         } else {
-            let definition = create_load_failed_character_definition(
-                folder_id,
-                failed_definition_index,
-                &load_failed_definition,
-            );
-            failed_definition_index += 1;
+            loop {
+                let definition = create_load_failed_character_definition(
+                    folder_id,
+                    failed_definition_index,
+                    &load_failed_definition,
+                );
+                failed_definition_index += 1;
 
-            if seen_ids.insert(definition.id.clone()) {
-                characters.push(definition);
+                if seen_ids.insert(definition.id.clone()) {
+                    characters.push(definition);
+                    break;
+                }
             }
         }
     }
@@ -597,25 +601,48 @@ fn ensure_load_failed_character_definition(
     let definition_path = character_dir.join("character.json");
     if !definition_path.exists() {
         let definition = CharacterDefinitionFile {
-            id: Some("load-failed".to_string()),
+            id: Some(LOAD_FAILED_CHARACTER_ID.to_string()),
             name: Some(LOAD_FAILED_CHARACTER_NAME.to_string()),
             primary: Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string()),
             terminal_background: Some(LOAD_FAILED_CHARACTER_BACKGROUND.to_string()),
         };
-        let definition_text =
-            serde_json::to_string_pretty(&definition).map_err(|error| error.to_string())?;
-        fs::write(&definition_path, format!("{definition_text}\n"))
-            .map_err(|error| error.to_string())?;
+        write_character_definition_file(&definition_path, &definition)?;
+    } else if let Some(definition) = read_character_definition_file(&definition_path) {
+        if is_legacy_load_failed_definition(&definition) {
+            let definition = CharacterDefinitionFile {
+                id: Some(LOAD_FAILED_CHARACTER_ID.to_string()),
+                name: Some(LOAD_FAILED_CHARACTER_NAME.to_string()),
+                primary: Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string()),
+                terminal_background: Some(LOAD_FAILED_CHARACTER_BACKGROUND.to_string()),
+            };
+            write_character_definition_file(&definition_path, &definition)?;
+        }
     }
 
     Ok(
         read_character_definition_file(&definition_path).unwrap_or(CharacterDefinitionFile {
-            id: Some("load-failed".to_string()),
+            id: Some(LOAD_FAILED_CHARACTER_ID.to_string()),
             name: Some(LOAD_FAILED_CHARACTER_NAME.to_string()),
             primary: Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string()),
             terminal_background: Some(LOAD_FAILED_CHARACTER_BACKGROUND.to_string()),
         }),
     )
+}
+
+fn write_character_definition_file(
+    path: &PathBuf,
+    definition: &CharacterDefinitionFile,
+) -> Result<(), String> {
+    let definition_text =
+        serde_json::to_string_pretty(definition).map_err(|error| error.to_string())?;
+    fs::write(path, format!("{definition_text}\n")).map_err(|error| error.to_string())
+}
+
+fn is_legacy_load_failed_definition(definition: &CharacterDefinitionFile) -> bool {
+    definition.id.as_deref() == Some("load-failed")
+        && definition.name.as_deref() == Some("Load Failed")
+        && definition.primary.as_deref() == Some("#FF6B6B")
+        && definition.terminal_background.as_deref() == Some("#281316")
 }
 
 fn create_load_failed_character_definition(
@@ -625,14 +652,15 @@ fn create_load_failed_character_definition(
 ) -> CharacterDefinition {
     let fallback_id = clean_optional_string(&load_failed_definition.id)
         .filter(|id| is_valid_character_id(id))
-        .unwrap_or_else(|| "load-failed".to_string());
-    let id = format!("{fallback_id}-{index}");
+        .unwrap_or_else(|| LOAD_FAILED_CHARACTER_ID.to_string());
+    let suffix = alphabetic_suffix(index);
+    let id = format!("{fallback_id}-{}", suffix.to_ascii_lowercase());
     let name = clean_optional_string(&load_failed_definition.name)
         .unwrap_or_else(|| LOAD_FAILED_CHARACTER_NAME.to_string());
 
     CharacterDefinition {
         id,
-        name: Some(format!("{name} {index}")),
+        name: Some(format!("{name} {suffix}")),
         primary: clean_hex_color(&load_failed_definition.primary)
             .or_else(|| Some(LOAD_FAILED_CHARACTER_PRIMARY.to_string())),
         terminal_background: clean_hex_color(&load_failed_definition.terminal_background)
@@ -642,6 +670,20 @@ fn create_load_failed_character_definition(
         idle_path: None,
         needs_you_path: None,
     }
+}
+
+fn alphabetic_suffix(index: usize) -> String {
+    let mut index = index.max(1);
+    let mut suffix = String::new();
+
+    while index > 0 {
+        index -= 1;
+        let character = (b'A' + (index % 26) as u8) as char;
+        suffix.insert(0, character);
+        index /= 26;
+    }
+
+    suffix
 }
 
 fn read_character_definition(

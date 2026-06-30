@@ -179,7 +179,7 @@ function mergeExternalCharacterDefinition(
 }
 
 function createExternalCharacter(definition: ExternalCharacterDefinition, cacheToken: string): Character {
-  const baseCharacter = defaultCharacters[0];
+  const baseCharacter = definition.loadError ? spriteCharacter("void") : defaultCharacters[0];
   const primary = definition.primary ?? baseCharacter.primary;
 
   return {

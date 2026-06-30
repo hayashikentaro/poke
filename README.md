@@ -177,7 +177,7 @@ characters/
     character.json
 ```
 
-This setting is used when an external character folder cannot be read as a normal character. If multiple folders fail to load, Poke creates separate runtime entries such as `load-failed-1` and `load-failed-2` so each failed folder remains visible instead of collapsing into one character.
+This setting is used when an external character folder cannot be read as a normal character. The default failed-load character is `Void`. If multiple folders fail to load, Poke creates separate runtime entries such as `Void A` and `Void B` so each failed folder remains visible instead of collapsing into one character.
 
 ## Frontend-only development
 
