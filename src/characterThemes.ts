@@ -37,6 +37,7 @@ export type PokeXtermTheme = {
 };
 
 export type PokeUiTheme = {
+  terminalBackground: string;
   appBackground: string;
   panelBackground: string;
   tabBackground: string;
@@ -93,6 +94,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#1D2015",
         "appBackground": "#15170F",
         "panelBackground": "#1D2013",
         "tabBackground": "#1D2015",
@@ -139,6 +141,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#181D1F",
         "appBackground": "#111516",
         "panelBackground": "#171D1F",
         "tabBackground": "#181D1F",
@@ -185,6 +188,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#21191C",
         "appBackground": "#171113",
         "panelBackground": "#21191C",
         "tabBackground": "#21191C",
@@ -231,6 +235,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#2A2116",
         "appBackground": "#211910",
         "panelBackground": "#2A2217",
         "tabBackground": "#2A2116",
@@ -277,6 +282,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#1A1821",
         "appBackground": "#121117",
         "panelBackground": "#181720",
         "tabBackground": "#1A1821",
@@ -323,6 +329,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#2A2816",
         "appBackground": "#212010",
         "panelBackground": "#2A2817",
         "tabBackground": "#2A2816",
@@ -369,6 +376,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#16221B",
         "appBackground": "#0F1713",
         "panelBackground": "#132019",
         "tabBackground": "#16221B",
@@ -415,6 +423,7 @@ export const pokeCharacterThemes = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
+        "terminalBackground": "#211827",
         "appBackground": "#18111C",
         "panelBackground": "#211A28",
         "tabBackground": "#211827",
@@ -441,6 +450,7 @@ export function getCharacterTheme(characterId: CharacterId): PokeCharacterTheme 
 }
 
 export function applyPokeUiTheme(theme: PokeUiTheme, root: HTMLElement = document.documentElement): void {
+  root.style.setProperty("--poke-terminal-bg", theme.terminalBackground);
   root.style.setProperty("--poke-app-bg", theme.appBackground);
   root.style.setProperty("--poke-panel-bg", theme.panelBackground);
   root.style.setProperty("--poke-tab-bg", theme.tabBackground);
