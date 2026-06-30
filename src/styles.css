@@ -82,7 +82,12 @@ body {
   padding: 0;
   overflow-x: auto;
   overflow-y: hidden;
+  scrollbar-width: none;
   background: var(--poke-panel-bg);
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-item {
