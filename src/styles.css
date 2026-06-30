@@ -92,7 +92,7 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
-  background: var(--poke-panel-bg);
+  background: var(--poke-app-bg);
 }
 
 .tab-bar::-webkit-scrollbar {
