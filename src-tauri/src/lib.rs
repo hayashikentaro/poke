@@ -7,6 +7,7 @@ use std::{
     path::PathBuf,
     sync::{Arc, Mutex},
     thread,
+    time::{SystemTime, UNIX_EPOCH},
 };
 use tauri::{AppHandle, Emitter, Manager, State};
 
@@ -69,6 +70,25 @@ fn update_terminal_font_size(app: AppHandle, font_size: u16) -> Result<AppConfig
     let config_path = app_config_path(&app)?;
     write_default_app_config(&config_path, &config)?;
     Ok(config)
+}
+
+#[tauri::command]
+fn stage_dropped_file(app: AppHandle, file_name: String, data: Vec<u8>) -> Result<String, String> {
+    let drops_dir = app
+        .path()
+        .app_cache_dir()
+        .map_err(|error| error.to_string())?
+        .join("dropped-files");
+    fs::create_dir_all(&drops_dir).map_err(|error| error.to_string())?;
+
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| error.to_string())?
+        .as_millis();
+    let file_path = drops_dir.join(format!("{timestamp}-{}", sanitize_file_name(&file_name)));
+
+    fs::write(&file_path, data).map_err(|error| error.to_string())?;
+    Ok(file_path.to_string_lossy().into_owned())
 }
 
 #[tauri::command]
@@ -265,6 +285,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_app_config,
             update_terminal_font_size,
+            stage_dropped_file,
             create_session,
             write_to_session,
             resize_session,
@@ -289,6 +310,32 @@ fn default_shell() -> String {
             "/bin/sh".to_string()
         }
     })
+}
+
+fn sanitize_file_name(file_name: &str) -> String {
+    let file_path = PathBuf::from(file_name);
+    let base_name = file_path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("dropped-file");
+    let sanitized = base_name
+        .chars()
+        .map(|character| {
+            if character.is_ascii_alphanumeric() || matches!(character, '.' | '-' | '_') {
+                character
+            } else {
+                '_'
+            }
+        })
+        .collect::<String>()
+        .trim_matches('.')
+        .to_string();
+
+    if sanitized.is_empty() {
+        "dropped-file".to_string()
+    } else {
+        sanitized
+    }
 }
 
 fn app_config_path(app: &AppHandle) -> Result<PathBuf, String> {

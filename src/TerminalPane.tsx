@@ -39,11 +39,16 @@ type SessionExit = {
   code: number | null;
 };
 
+type DroppedFile = File & {
+  path?: string;
+};
+
 type TerminalSurfaceProps = {
   active: boolean;
   config: AppConfig;
   onExit: (sessionId: string) => void;
   onOutput: (sessionId: string) => void;
+  onTerminalReady: (sessionId: string, terminal: Terminal | null) => void;
   session: TerminalSession;
 };
 
@@ -95,7 +100,37 @@ function createTerminal(config: AppConfig) {
   });
 }
 
-function TerminalSurface({ active, config, onExit, onOutput, session }: TerminalSurfaceProps) {
+function getDroppedFilePath(file: File) {
+  const path = (file as DroppedFile).path;
+
+  return typeof path === "string" && path.length > 0 ? path : null;
+}
+
+function shellQuotePath(path: string) {
+  return `'${path.split("'").join("'\\''")}'`;
+}
+
+function hasDraggedFiles(dataTransfer: DataTransfer) {
+  return Array.from(dataTransfer.types).includes("Files");
+}
+
+async function stageDroppedFile(file: File) {
+  const data = Array.from(new Uint8Array(await file.arrayBuffer()));
+
+  return invoke<string>("stage_dropped_file", {
+    fileName: file.name || "dropped-file",
+    data
+  });
+}
+
+function TerminalSurface({
+  active,
+  config,
+  onExit,
+  onOutput,
+  onTerminalReady,
+  session
+}: TerminalSurfaceProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -113,6 +148,7 @@ function TerminalSurface({ active, config, onExit, onOutput, session }: Terminal
 
     terminalRef.current = terminal;
     fitAddonRef.current = fitAddon;
+    onTerminalReady(session.id, terminal);
     terminal.loadAddon(fitAddon);
     terminal.open(container);
 
@@ -184,8 +220,9 @@ function TerminalSurface({ active, config, onExit, onOutput, session }: Terminal
       terminal.dispose();
       terminalRef.current = null;
       fitAddonRef.current = null;
+      onTerminalReady(session.id, null);
     };
-  }, [onExit, onOutput, session.id]);
+  }, [onExit, onOutput, onTerminalReady, session.id]);
 
   useEffect(() => {
     const terminal = terminalRef.current;
@@ -248,6 +285,7 @@ function TerminalSurface({ active, config, onExit, onOutput, session }: Terminal
 
 export function TerminalPane() {
   const nextTabIndex = useRef(2);
+  const terminalRefs = useRef(new Map<string, Terminal>());
   const [config, setConfig] = useState<AppConfig>(defaultAppConfig);
   const initialSession = useMemo<TerminalSession>(
     () => ({
@@ -265,6 +303,14 @@ export function TerminalPane() {
   const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
+
+  const handleTerminalReady = useCallback((sessionId: string, terminal: Terminal | null) => {
+    if (terminal) {
+      terminalRefs.current.set(sessionId, terminal);
+    } else {
+      terminalRefs.current.delete(sessionId);
+    }
+  }, []);
 
   useEffect(() => {
     void invoke<AppConfig>("get_app_config")
@@ -470,10 +516,60 @@ export function TerminalPane() {
     });
   }, []);
 
+  const pasteDroppedFiles = useCallback(
+    async (files: File[]) => {
+      const terminal = terminalRefs.current.get(activeSessionId);
+
+      if (!terminal || files.length === 0) {
+        return;
+      }
+
+      try {
+        const paths = await Promise.all(
+          files.map(async (file) => getDroppedFilePath(file) ?? stageDroppedFile(file))
+        );
+        const pasteText = `${paths.map(shellQuotePath).join(" ")} `;
+
+        terminal.focus();
+        terminal.paste(pasteText);
+      } catch (error: unknown) {
+        console.error("Failed to paste dropped file paths", error);
+      }
+    },
+    [activeSessionId]
+  );
+
+  const handleWorkspaceDragOver = useCallback((event: React.DragEvent<HTMLElement>) => {
+    if (!hasDraggedFiles(event.dataTransfer)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  }, []);
+
+  const handleWorkspaceDrop = useCallback(
+    (event: React.DragEvent<HTMLElement>) => {
+      if (!hasDraggedFiles(event.dataTransfer)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      void pasteDroppedFiles(Array.from(event.dataTransfer.files));
+    },
+    [pasteDroppedFiles]
+  );
+
   const pickerSession = sessions.find((session) => session.id === pickerSessionId) ?? null;
 
   return (
-    <section className="terminal-workspace" aria-label="Terminal sessions">
+    <section
+      className="terminal-workspace"
+      aria-label="Terminal sessions"
+      onDragOver={handleWorkspaceDragOver}
+      onDrop={handleWorkspaceDrop}
+    >
       <div className="tab-bar" role="tablist" aria-label="Terminal tabs">
         {sessions.map((session) => {
           const character = getCharacter(session.characterId);
@@ -583,6 +679,7 @@ export function TerminalPane() {
             config={config}
             onExit={handleSessionExit}
             onOutput={handleSessionOutput}
+            onTerminalReady={handleTerminalReady}
             session={session}
           />
         ))}
