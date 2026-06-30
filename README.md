@@ -2,20 +2,19 @@
 
 Poke is a Tauri desktop terminal app with character-based tabs. The current prototype runs multiple real shell sessions through xterm.js and a Rust PTY backend.
 
-![Poke v0.1.0 screenshot](docs/images/poke-v0.1.0.png)
+![Poke screenshot](docs/images/poke-screenshot.png)
 
-## Download v0.1.0
+## Download
 
 Download the macOS build from GitHub Releases:
 
-- [Poke-v0.1.0-macos.zip](https://github.com/hayashikentaro/poke/releases/download/v0.1.0/Poke-v0.1.0-macos.zip)
-- [Release notes](https://github.com/hayashikentaro/poke/releases/tag/v0.1.0)
+- [Latest release](https://github.com/hayashikentaro/poke/releases/latest)
 
 Unzip the file, then open `Poke.app`.
 
-This v0.1.0 build is an unsigned macOS app. If macOS blocks the first launch, open it from Finder with right click, then `Open`.
+This is an unsigned macOS app. If macOS blocks the first launch, open it from Finder with right click, then `Open`.
 
-## v0.1.0 Features
+## Features
 
 - Real shell sessions backed by a Rust PTY
 - Multiple terminal tabs
