@@ -125,6 +125,28 @@ While the app is running, use `Command + +` or `Command + -` to change the termi
 
 Development defaults live in `src/appConfig.ts`.
 
+## Character Image Overrides
+
+Poke creates character image override folders in the app config directory:
+
+```sh
+~/Library/Application Support/com.poke.terminal/characters/
+```
+
+To replace a character image, put PNG files in the matching character folder:
+
+```text
+characters/
+  kiri/
+    icon_32x32.png
+    idle_32x32_6f.png
+    needs_you_32x32_8f.png
+```
+
+Files are optional. If a file is missing, Poke uses the built-in image for that part.
+
+Restart the app after changing character image files.
+
 ## Frontend-only development
 
 ```sh

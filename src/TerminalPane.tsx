@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
@@ -39,6 +39,19 @@ type SessionExit = {
   code: number | null;
 };
 
+type CharacterImageOverride = {
+  id: CharacterId;
+  iconPath: string | null;
+  idlePath: string | null;
+  needsYouPath: string | null;
+};
+
+type CharacterImageOverrides = {
+  configDir: string;
+  charactersDir: string;
+  overrides: CharacterImageOverride[];
+};
+
 type DroppedFile = File & {
   path?: string;
 };
@@ -69,7 +82,7 @@ function spriteCharacter(id: CharacterId, name: string): Character {
   };
 }
 
-const characters: Character[] = [
+const defaultCharacters: Character[] = [
   spriteCharacter("mugi", "Mugi"),
   spriteCharacter("rune", "Rune"),
   spriteCharacter("kiku", "Kiku"),
@@ -80,7 +93,7 @@ const characters: Character[] = [
   spriteCharacter("kiri", "Kiri")
 ];
 
-function getCharacter(characterId: string) {
+function getCharacter(characterId: string, characters: Character[]) {
   return characters.find((character) => character.id === characterId) ?? characters[0];
 }
 
@@ -88,7 +101,7 @@ function getRandomCharacterId(candidates: Character[]) {
   return candidates[Math.floor(Math.random() * candidates.length)].id;
 }
 
-function getNextCharacterId(sessions: TerminalSession[] = []) {
+function getNextCharacterId(sessions: TerminalSession[] = [], characters: Character[] = defaultCharacters) {
   const used = new Set(sessions.map((session) => session.characterId));
   const unusedCharacters = characters.filter((character) => !used.has(character.id));
   return getRandomCharacterId(unusedCharacters.length > 0 ? unusedCharacters : characters);
@@ -100,7 +113,32 @@ function createTerminal(config: AppConfig) {
     fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", monospace',
     fontSize: config.terminal.fontSize,
     lineHeight: 1.2,
-    theme: getCharacterTheme(characters[0].id).theme.xterm
+    theme: getCharacterTheme(defaultCharacters[0].id).theme.xterm
+  });
+}
+
+function withCharacterImageOverrides(
+  characters: Character[],
+  imageOverrides: CharacterImageOverrides
+) {
+  const overridesById = new Map(imageOverrides.overrides.map((override) => [override.id, override]));
+  const cacheToken = encodeURIComponent(String(Date.now()));
+
+  return characters.map((character) => {
+    const override = overridesById.get(character.id);
+
+    if (!override) {
+      return character;
+    }
+
+    return {
+      ...character,
+      iconSrc: override.iconPath ? `${convertFileSrc(override.iconPath)}?v=${cacheToken}` : character.iconSrc,
+      idleSrc: override.idlePath ? `${convertFileSrc(override.idlePath)}?v=${cacheToken}` : character.idleSrc,
+      needsYouSrc: override.needsYouPath
+        ? `${convertFileSrc(override.needsYouPath)}?v=${cacheToken}`
+        : character.needsYouSrc
+    };
   });
 }
 
@@ -291,6 +329,7 @@ export function TerminalPane() {
   const nextTabIndex = useRef(2);
   const terminalRefs = useRef(new Map<string, Terminal>());
   const [config, setConfig] = useState<AppConfig>(defaultAppConfig);
+  const [characters, setCharacters] = useState<Character[]>(defaultCharacters);
   const initialSession = useMemo<TerminalSession>(
     () => ({
       id: crypto.randomUUID(),
@@ -321,6 +360,16 @@ export function TerminalPane() {
       .then(setConfig)
       .catch((error: unknown) => {
         console.error("Failed to load app config", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    void invoke<CharacterImageOverrides>("get_character_image_overrides")
+      .then((imageOverrides) => {
+        setCharacters(withCharacterImageOverrides(defaultCharacters, imageOverrides));
+      })
+      .catch((error: unknown) => {
+        console.error("Failed to load character image overrides", error);
       });
   }, []);
 
@@ -449,7 +498,7 @@ export function TerminalPane() {
       id: crypto.randomUUID(),
       title: `shell ${index}`,
       attention: "not_now",
-      characterId: getNextCharacterId(sessions),
+      characterId: getNextCharacterId(sessions, characters),
       lastOutputAt: null
     };
 
@@ -469,7 +518,7 @@ export function TerminalPane() {
           id: crypto.randomUUID(),
           title: "shell",
           attention: "not_now",
-          characterId: getNextCharacterId(),
+          characterId: getNextCharacterId([], characters),
           lastOutputAt: null
         };
         nextTabIndex.current = 2;
@@ -576,7 +625,7 @@ export function TerminalPane() {
     >
       <div className="tab-bar" role="tablist" aria-label="Terminal tabs">
         {sessions.map((session) => {
-          const character = getCharacter(session.characterId);
+          const character = getCharacter(session.characterId, characters);
           const isActive = session.id === activeSessionId;
           const tabTheme = getCharacterTheme(session.characterId).theme.ui;
 
@@ -672,6 +721,7 @@ export function TerminalPane() {
           <CharacterPicker
             session={pickerSession}
             sessions={sessions}
+            characters={characters}
             onClose={() => setPickerSessionId(null)}
             onSelect={(characterId) => replaceCharacter(pickerSession.id, characterId)}
           />
@@ -709,11 +759,13 @@ function CharacterIcon({ character, state }: { character: Character; state: Atte
 }
 
 function CharacterPicker({
+  characters,
   onClose,
   onSelect,
   session,
   sessions
 }: {
+  characters: Character[];
   onClose: () => void;
   onSelect: (characterId: CharacterId) => void;
   session: TerminalSession;
@@ -758,10 +810,10 @@ function CharacterPicker({
         }
       }
 
-      if (/^[1-8]$/.test(event.key)) {
+      if (/^[1-9]$/.test(event.key)) {
         event.preventDefault();
         const character = characters[Number(event.key) - 1];
-        if (!usedByAnotherSession.has(character.id)) {
+        if (character && !usedByAnotherSession.has(character.id)) {
           onSelect(character.id);
         }
       }
@@ -769,7 +821,7 @@ function CharacterPicker({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [highlightedIndex, onClose, onSelect, usedByAnotherSession]);
+  }, [characters, highlightedIndex, onClose, onSelect, usedByAnotherSession]);
 
   return (
     <div className="picker-layer" aria-modal="true" role="dialog" aria-label="Change character" onMouseDown={onClose}>

@@ -46,8 +46,75 @@ struct TerminalConfig {
     font_size: u16,
 }
 
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CharacterImageOverrides {
+    config_dir: String,
+    characters_dir: String,
+    overrides: Vec<CharacterImageOverride>,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CharacterImageOverride {
+    id: String,
+    icon_path: Option<String>,
+    idle_path: Option<String>,
+    needs_you_path: Option<String>,
+}
+
 const MIN_TERMINAL_FONT_SIZE: u16 = 10;
 const MAX_TERMINAL_FONT_SIZE: u16 = 32;
+const CHARACTER_ASSET_FILES: [(&str, &str, &str, &str); 8] = [
+    (
+        "mugi",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "rune",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "kiku",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "sora",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "nagi",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "yuzu",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "haru",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+    (
+        "kiri",
+        "icon_32x32.png",
+        "idle_32x32_6f.png",
+        "needs_you_32x32_8f.png",
+    ),
+];
 
 impl Default for AppConfig {
     fn default() -> Self {
@@ -70,6 +137,33 @@ fn update_terminal_font_size(app: AppHandle, font_size: u16) -> Result<AppConfig
     let config_path = app_config_path(&app)?;
     write_default_app_config(&config_path, &config)?;
     Ok(config)
+}
+
+#[tauri::command]
+fn get_character_image_overrides(app: AppHandle) -> Result<CharacterImageOverrides, String> {
+    let config_dir = app_config_dir(&app)?;
+    let characters_dir = config_dir.join("characters");
+    fs::create_dir_all(&characters_dir).map_err(|error| error.to_string())?;
+
+    let mut overrides = Vec::with_capacity(CHARACTER_ASSET_FILES.len());
+
+    for (id, icon_file, idle_file, needs_you_file) in CHARACTER_ASSET_FILES {
+        let character_dir = characters_dir.join(id);
+        fs::create_dir_all(&character_dir).map_err(|error| error.to_string())?;
+
+        overrides.push(CharacterImageOverride {
+            id: id.to_string(),
+            icon_path: existing_image_path(character_dir.join(icon_file)),
+            idle_path: existing_image_path(character_dir.join(idle_file)),
+            needs_you_path: existing_image_path(character_dir.join(needs_you_file)),
+        });
+    }
+
+    Ok(CharacterImageOverrides {
+        config_dir: config_dir.to_string_lossy().into_owned(),
+        characters_dir: characters_dir.to_string_lossy().into_owned(),
+        overrides,
+    })
 }
 
 #[tauri::command]
@@ -285,6 +379,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_app_config,
             update_terminal_font_size,
+            get_character_image_overrides,
             stage_dropped_file,
             create_session,
             write_to_session,
@@ -338,13 +433,26 @@ fn sanitize_file_name(file_name: &str) -> String {
     }
 }
 
-fn app_config_path(app: &AppHandle) -> Result<PathBuf, String> {
+fn app_config_dir(app: &AppHandle) -> Result<PathBuf, String> {
     let config_dir = app
         .path()
         .app_config_dir()
         .map_err(|error| error.to_string())?;
     fs::create_dir_all(&config_dir).map_err(|error| error.to_string())?;
+    Ok(config_dir)
+}
+
+fn app_config_path(app: &AppHandle) -> Result<PathBuf, String> {
+    let config_dir = app_config_dir(app)?;
     Ok(config_dir.join("config.json"))
+}
+
+fn existing_image_path(path: PathBuf) -> Option<String> {
+    if path.is_file() {
+        Some(path.to_string_lossy().into_owned())
+    } else {
+        None
+    }
 }
 
 fn write_default_app_config(config_path: &PathBuf, config: &AppConfig) -> Result<(), String> {
