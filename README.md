@@ -133,7 +133,9 @@ Poke creates character customization folders in the app config directory:
 ~/Library/Application Support/com.poke.terminal/characters/
 ```
 
-To replace a built-in character image or metadata, put files in the matching character folder:
+On first run, Poke creates `character.json` files for the built-in characters in this directory. These files are the editable runtime character settings. Built-in app data is used only as a fallback when a runtime setting is missing or invalid.
+
+To replace a built-in character image or metadata, edit files in the matching character folder:
 
 ```text
 characters/
@@ -154,7 +156,7 @@ characters/
 }
 ```
 
-For built-in characters, all files are optional. If a value or image is missing, Poke uses the built-in definition for that part.
+For built-in characters, image files are optional. If a value or image is missing, Poke uses the built-in definition for that part.
 
 To add a new character, create a new folder under `characters/` with:
 

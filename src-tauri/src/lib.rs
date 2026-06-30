@@ -66,7 +66,7 @@ struct CharacterDefinition {
     needs_you_path: Option<String>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct CharacterDefinitionFile {
     id: Option<String>,
@@ -75,57 +75,94 @@ struct CharacterDefinitionFile {
     terminal_background: Option<String>,
 }
 
+struct BuiltInCharacter {
+    id: &'static str,
+    name: &'static str,
+    primary: &'static str,
+    terminal_background: &'static str,
+    icon_file: &'static str,
+    idle_file: &'static str,
+    needs_you_file: &'static str,
+}
+
 const MIN_TERMINAL_FONT_SIZE: u16 = 10;
 const MAX_TERMINAL_FONT_SIZE: u16 = 32;
-const CHARACTER_ASSET_FILES: [(&str, &str, &str, &str); 8] = [
-    (
-        "mugi",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "rune",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "kiku",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "sora",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "nagi",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "yuzu",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "haru",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
-    (
-        "kiri",
-        "icon_32x32.png",
-        "idle_32x32_6f.png",
-        "needs_you_32x32_8f.png",
-    ),
+const DEFAULT_CHARACTER_ICON_FILE: &str = "icon_32x32.png";
+const DEFAULT_CHARACTER_IDLE_FILE: &str = "idle_32x32_6f.png";
+const DEFAULT_CHARACTER_NEEDS_YOU_FILE: &str = "needs_you_32x32_8f.png";
+const BUILT_IN_CHARACTERS: [BuiltInCharacter; 8] = [
+    BuiltInCharacter {
+        id: "mugi",
+        name: "Mugi",
+        primary: "#D9F28B",
+        terminal_background: "#1D2015",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "rune",
+        name: "Rune",
+        primary: "#9EE7FF",
+        terminal_background: "#181D1F",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "kiku",
+        name: "Kiku",
+        primary: "#FFB4D6",
+        terminal_background: "#21191C",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "sora",
+        name: "Sora",
+        primary: "#FFC979",
+        terminal_background: "#2A2116",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "nagi",
+        name: "Nagi",
+        primary: "#BCA7FF",
+        terminal_background: "#1A1821",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "yuzu",
+        name: "Yuzu",
+        primary: "#FFE066",
+        terminal_background: "#2A2816",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "haru",
+        name: "Haru",
+        primary: "#98F5C4",
+        terminal_background: "#16221B",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
+    BuiltInCharacter {
+        id: "kiri",
+        name: "Kiri",
+        primary: "#D49BFF",
+        terminal_background: "#211827",
+        icon_file: DEFAULT_CHARACTER_ICON_FILE,
+        idle_file: DEFAULT_CHARACTER_IDLE_FILE,
+        needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
+    },
 ];
 
 impl Default for AppConfig {
@@ -160,16 +197,17 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
     let mut characters = Vec::new();
     let mut seen_ids = HashSet::new();
 
-    for (id, icon_file, idle_file, needs_you_file) in CHARACTER_ASSET_FILES {
-        let character_dir = characters_dir.join(id);
+    for character in BUILT_IN_CHARACTERS {
+        let character_dir = characters_dir.join(character.id);
         fs::create_dir_all(&character_dir).map_err(|error| error.to_string())?;
+        ensure_default_character_definition(&character_dir, &character)?;
 
         if let Some(definition) = read_character_definition(
             &character_dir,
-            id,
-            icon_file,
-            idle_file,
-            needs_you_file,
+            character.id,
+            character.icon_file,
+            character.idle_file,
+            character.needs_you_file,
             false,
         ) {
             seen_ids.insert(definition.id.clone());
@@ -190,9 +228,9 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
             None => continue,
         };
 
-        if CHARACTER_ASSET_FILES
+        if BUILT_IN_CHARACTERS
             .iter()
-            .any(|(default_id, _, _, _)| *default_id == folder_id)
+            .any(|character| character.id == folder_id)
         {
             continue;
         }
@@ -200,9 +238,9 @@ fn get_character_definitions(app: AppHandle) -> Result<CharacterDefinitions, Str
         if let Some(definition) = read_character_definition(
             &character_dir,
             folder_id,
-            "icon_32x32.png",
-            "idle_32x32_6f.png",
-            "needs_you_32x32_8f.png",
+            DEFAULT_CHARACTER_ICON_FILE,
+            DEFAULT_CHARACTER_IDLE_FILE,
+            DEFAULT_CHARACTER_NEEDS_YOU_FILE,
             true,
         ) {
             if seen_ids.insert(definition.id.clone()) {
@@ -505,6 +543,27 @@ fn existing_image_path(path: PathBuf) -> Option<String> {
     } else {
         None
     }
+}
+
+fn ensure_default_character_definition(
+    character_dir: &PathBuf,
+    character: &BuiltInCharacter,
+) -> Result<(), String> {
+    let definition_path = character_dir.join("character.json");
+
+    if definition_path.exists() {
+        return Ok(());
+    }
+
+    let definition = CharacterDefinitionFile {
+        id: Some(character.id.to_string()),
+        name: Some(character.name.to_string()),
+        primary: Some(character.primary.to_string()),
+        terminal_background: Some(character.terminal_background.to_string()),
+    };
+    let definition_text =
+        serde_json::to_string_pretty(&definition).map_err(|error| error.to_string())?;
+    fs::write(definition_path, format!("{definition_text}\n")).map_err(|error| error.to_string())
 }
 
 fn read_character_definition(
