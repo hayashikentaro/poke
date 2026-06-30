@@ -84,9 +84,14 @@ function getCharacter(characterId: string) {
   return characters.find((character) => character.id === characterId) ?? characters[0];
 }
 
-function getNextCharacterId(sessions: TerminalSession[]) {
+function getRandomCharacterId(candidates: Character[]) {
+  return candidates[Math.floor(Math.random() * candidates.length)].id;
+}
+
+function getNextCharacterId(sessions: TerminalSession[] = []) {
   const used = new Set(sessions.map((session) => session.characterId));
-  return characters.find((character) => !used.has(character.id))?.id ?? characters[sessions.length % characters.length].id;
+  const unusedCharacters = characters.filter((character) => !used.has(character.id));
+  return getRandomCharacterId(unusedCharacters.length > 0 ? unusedCharacters : characters);
 }
 
 function createTerminal(config: AppConfig) {
@@ -291,7 +296,7 @@ export function TerminalPane() {
       id: crypto.randomUUID(),
       title: "shell",
       attention: "not_now",
-      characterId: characters[0].id,
+      characterId: getNextCharacterId(),
       lastOutputAt: null
     }),
     []
@@ -464,7 +469,7 @@ export function TerminalPane() {
           id: crypto.randomUUID(),
           title: "shell",
           attention: "not_now",
-          characterId: characters[0].id,
+          characterId: getNextCharacterId(),
           lastOutputAt: null
         };
         nextTabIndex.current = 2;
