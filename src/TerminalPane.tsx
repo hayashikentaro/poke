@@ -92,8 +92,7 @@ function getNextCharacterId(sessions: TerminalSession[]) {
 function createTerminal(config: AppConfig) {
   return new Terminal({
     cursorBlink: true,
-    fontFamily:
-      '"Bizin Gothic", SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+    fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", monospace',
     fontSize: config.terminal.fontSize,
     lineHeight: 1.2,
     theme: getCharacterTheme(characters[0].id).theme.xterm
