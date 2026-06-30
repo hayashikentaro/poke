@@ -451,6 +451,7 @@ export function TerminalPane() {
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
   const activeCharacter = getCharacter(activeSession.characterId, characters);
+  const canCreateSession = sessions.length < characters.length;
 
   const handleTerminalReady = useCallback((sessionId: string, terminal: Terminal | null) => {
     if (terminal) {
@@ -596,9 +597,12 @@ export function TerminalPane() {
   }, []);
 
   const createSession = () => {
+    if (!canCreateSession) {
+      return;
+    }
+
     const index = nextTabIndex.current;
     nextTabIndex.current += 1;
-
     const session: TerminalSession = {
       id: crypto.randomUUID(),
       title: `shell ${index}`,
@@ -607,7 +611,7 @@ export function TerminalPane() {
       lastOutputAt: null
     };
 
-    setSessions((currentSessions) => [...currentSessions, session]);
+    setSessions([...sessions, session]);
     setPickerSessionId(null);
     setActiveSessionId(session.id);
   };
@@ -816,9 +820,11 @@ export function TerminalPane() {
             </div>
           );
         })}
-        <button type="button" className="new-tab-button" aria-label="New tab" onClick={createSession}>
-          +
-        </button>
+        {canCreateSession ? (
+          <button type="button" className="new-tab-button" aria-label="New tab" onClick={createSession}>
+            +
+          </button>
+        ) : null}
       </div>
 
       <div className="terminal-pane">
