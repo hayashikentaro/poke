@@ -99,7 +99,10 @@ fn create_session(
         .map_err(|error| error.to_string())?;
 
     let shell = default_shell();
-    let command = CommandBuilder::new(shell);
+    let mut command = CommandBuilder::new(shell);
+    command.env("TERM", "xterm-256color");
+    command.env("COLORTERM", "truecolor");
+    command.env("CLICOLOR", "1");
     let child = pair
         .slave
         .spawn_command(command)
