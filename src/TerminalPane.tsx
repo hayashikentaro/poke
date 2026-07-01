@@ -79,6 +79,7 @@ const quietThresholdMs = 5000;
 const skinBasePath = "/skins/default-poke-crew/characters";
 const minTerminalFontSize = 10;
 const maxTerminalFontSize = 32;
+const terminalInputEncoder = new TextEncoder();
 
 function spriteCharacter(id: CharacterId): Character {
   const basePath = `${skinBasePath}/${id}`;
@@ -343,7 +344,10 @@ function TerminalSurface({
       }
 
       const inputDisposable = terminal.onData((data) => {
-        void invoke("write_to_session", { id: session.id, data }).catch(() => undefined);
+        void invoke("write_to_session", {
+          id: session.id,
+          data: Array.from(terminalInputEncoder.encode(data))
+        }).catch(() => undefined);
       });
       cleanupTasks.push(() => inputDisposable.dispose());
 

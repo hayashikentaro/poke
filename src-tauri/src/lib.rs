@@ -404,7 +404,7 @@ fn create_session(
 fn write_to_session(
     state: State<'_, TerminalState>,
     id: String,
-    data: String,
+    data: Vec<u8>,
 ) -> Result<(), String> {
     let writer = {
         let sessions_guard = state
@@ -420,9 +420,7 @@ fn write_to_session(
     let mut writer = writer
         .lock()
         .map_err(|_| "terminal writer lock poisoned".to_string())?;
-    writer
-        .write_all(data.as_bytes())
-        .map_err(|error| error.to_string())?;
+    writer.write_all(&data).map_err(|error| error.to_string())?;
     writer.flush().map_err(|error| error.to_string())
 }
 
