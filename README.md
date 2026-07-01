@@ -1,8 +1,25 @@
 # Poke
 
-Poke is a Tauri desktop terminal app with character-based tabs. The current prototype runs multiple real shell sessions through xterm.js and a Rust PTY backend.
+Poke is a desktop terminal for people who run multiple AI agent CLIs and shell sessions in parallel.
+
+Each terminal tab has a character and color. The goal is not decoration for its own sake: the character gives each session a recognizable face, and the color gives the terminal a quick visual identity. Together they make it easier to tell sessions apart, avoid selecting the wrong tab, and keep track of concurrent agent work.
+
+Poke also lightly shows when a background session may need you. If a non-active terminal goes quiet, its character changes state so you can notice it without reading every terminal buffer. In other words, Poke helps you know when to poke a session.
 
 ![Poke screenshot](docs/images/poke-screenshot.png)
+
+## Concept
+
+AI agent CLI work often means running several long-lived terminal sessions at once: one agent edits code, another runs tests, another investigates logs, and a normal shell stays nearby. Plain terminal tabs can make those sessions feel interchangeable, which increases cognitive load and makes tab selection mistakes easy.
+
+Poke treats each terminal session as something you can recognize at a glance:
+
+- Characters help identify sessions faster than text-only tab titles.
+- Per-character colors make terminal backgrounds visually distinct.
+- Attention state gives a small visual signal when a background session may need input.
+- Real PTY-backed tabs keep the app usable as a normal terminal, not a wrapper around agent-specific features.
+
+The product direction is to support human attention around AI agent CLI workflows while staying a normal terminal.
 
 ## Download
 
@@ -17,14 +34,15 @@ This is an unsigned macOS app. If macOS blocks the first launch, open it from Fi
 ## Features
 
 - Real shell sessions backed by a Rust PTY
-- Multiple terminal tabs
-- Character-based tab labels and sprites
-- Character picker
+- Multiple terminal tabs, each with its own PTY session
+- Character-based tab identity for recognizing sessions at a glance
+- Per-character terminal colors to reduce session confusion
+- Lightweight attention state for quiet background sessions
+- Character picker and external character customization
 - Drag-and-drop tab reordering
-- Per-character dark themes
 - Runtime terminal font size changes with `Command + +` and `Command + -`
 
-AI, notifications, persistence for tabs, command palette, and settings UI are intentionally not implemented yet.
+Poke does not currently implement AI itself. It is meant to help humans operate AI agent CLIs and normal shells more safely in parallel. Notifications, persistence for tabs, command palette, and settings UI are intentionally not implemented yet.
 
 ## Requirements
 
