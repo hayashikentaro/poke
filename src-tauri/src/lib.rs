@@ -25,7 +25,7 @@ struct TerminalSession {
 #[derive(Clone, Serialize)]
 struct SessionOutput {
     id: String,
-    data: String,
+    data: Vec<u8>,
 }
 
 #[derive(Clone, Serialize)]
@@ -357,12 +357,11 @@ fn create_session(
             match reader.read(&mut buffer) {
                 Ok(0) => break,
                 Ok(bytes_read) => {
-                    let data = String::from_utf8_lossy(&buffer[..bytes_read]).to_string();
                     let _ = reader_app.emit(
                         "session_output",
                         SessionOutput {
                             id: reader_id.clone(),
-                            data,
+                            data: buffer[..bytes_read].to_vec(),
                         },
                     );
                 }

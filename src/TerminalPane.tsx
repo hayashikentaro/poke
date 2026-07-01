@@ -36,7 +36,7 @@ type TerminalSession = {
 
 type SessionOutput = {
   id: string;
-  data: string;
+  data: number[];
 };
 
 type SessionExit = {
@@ -318,7 +318,7 @@ function TerminalSurface({
     const startSession = async () => {
       const unlistenOutput = await listen<SessionOutput>("session_output", (event) => {
         if (event.payload.id === session.id) {
-          terminal.write(event.payload.data);
+          terminal.write(Uint8Array.from(event.payload.data));
           onOutput(session.id);
         }
       });

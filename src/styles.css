@@ -207,10 +207,6 @@ body {
   background: transparent;
 }
 
-.terminal-surface .xterm-screen {
-  width: 100%;
-}
-
 .character-icon {
   width: 32px;
   height: 32px;
