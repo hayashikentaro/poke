@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
+import { Unicode11Addon } from "@xterm/addon-unicode11";
 import { Terminal } from "@xterm/xterm";
 import {
   applyPokeUiTheme,
@@ -291,11 +292,14 @@ function TerminalSurface({
 
     const terminal = createTerminal(config);
     const fitAddon = new FitAddon();
+    const unicode11Addon = new Unicode11Addon();
     terminal.options.theme = character.theme.xterm;
 
     terminalRef.current = terminal;
     fitAddonRef.current = fitAddon;
     onTerminalReady(session.id, terminal);
+    terminal.loadAddon(unicode11Addon);
+    terminal.unicode.activeVersion = "11";
     terminal.loadAddon(fitAddon);
     terminal.open(container);
 
