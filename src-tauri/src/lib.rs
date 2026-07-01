@@ -329,6 +329,7 @@ fn create_session(
         .map_err(|error| error.to_string())?;
 
     let mut command = default_shell_command();
+    apply_utf8_locale_defaults(&mut command);
     command.env("TERM", "xterm-256color");
     command.env("COLORTERM", "truecolor");
     command.env("CLICOLOR", "1");
@@ -515,6 +516,41 @@ fn default_shell_command() -> CommandBuilder {
     } else {
         CommandBuilder::new_default_prog()
     }
+}
+
+fn apply_utf8_locale_defaults(command: &mut CommandBuilder) {
+    if locale_needs_utf8_default("LANG") {
+        command.env("LANG", "en_US.UTF-8");
+    }
+
+    if locale_needs_utf8_default("LC_CTYPE") {
+        command.env("LC_CTYPE", "UTF-8");
+    }
+
+    if locale_needs_utf8_override("LC_ALL") {
+        command.env("LC_ALL", "en_US.UTF-8");
+    }
+}
+
+fn locale_needs_utf8_default(name: &str) -> bool {
+    match env::var(name) {
+        Ok(value) => is_basic_c_locale(&value),
+        Err(_) => true,
+    }
+}
+
+fn locale_needs_utf8_override(name: &str) -> bool {
+    match env::var(name) {
+        Ok(value) => is_basic_c_locale(&value),
+        Err(_) => false,
+    }
+}
+
+fn is_basic_c_locale(value: &str) -> bool {
+    let normalized = value.trim();
+    normalized.is_empty()
+        || normalized.eq_ignore_ascii_case("C")
+        || normalized.eq_ignore_ascii_case("POSIX")
 }
 
 fn sanitize_file_name(file_name: &str) -> String {
