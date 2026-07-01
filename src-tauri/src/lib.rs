@@ -328,8 +328,7 @@ fn create_session(
         })
         .map_err(|error| error.to_string())?;
 
-    let shell = default_shell();
-    let mut command = CommandBuilder::new(shell);
+    let mut command = default_shell_command();
     command.env("TERM", "xterm-256color");
     command.env("COLORTERM", "truecolor");
     command.env("CLICOLOR", "1");
@@ -512,14 +511,12 @@ pub fn run() {
         .expect("error while running Tauri application");
 }
 
-fn default_shell() -> String {
-    env::var("SHELL").unwrap_or_else(|_| {
-        if cfg!(windows) {
-            "powershell.exe".to_string()
-        } else {
-            "/bin/sh".to_string()
-        }
-    })
+fn default_shell_command() -> CommandBuilder {
+    if cfg!(windows) {
+        CommandBuilder::new(env::var("SHELL").unwrap_or_else(|_| "powershell.exe".to_string()))
+    } else {
+        CommandBuilder::new_default_prog()
+    }
 }
 
 fn sanitize_file_name(file_name: &str) -> String {
