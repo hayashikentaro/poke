@@ -377,7 +377,7 @@ function TerminalSurface({
       fitAddonRef.current = null;
       onTerminalReady(session.id, null);
     };
-  }, [character.theme.xterm, onExit, onOutput, onTerminalReady, session.id]);
+  }, [onExit, onOutput, onTerminalReady, session.id]);
 
   useEffect(() => {
     const terminal = terminalRef.current;
