@@ -126,6 +126,7 @@ function getNextCharacterId(sessions: TerminalSession[] = [], characters: Charac
 
 function createTerminal(config: AppConfig) {
   return new Terminal({
+    allowProposedApi: true,
     cursorBlink: true,
     fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", monospace',
     fontSize: config.terminal.fontSize,
