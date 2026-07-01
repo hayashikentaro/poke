@@ -262,6 +262,22 @@ function hasDraggedFiles(dataTransfer: DataTransfer) {
   return Array.from(dataTransfer.types).includes("Files");
 }
 
+function createTabDragPreview(tabElement: HTMLElement) {
+  const preview = document.createElement("div");
+  const tabClone = tabElement.cloneNode(true) as HTMLElement;
+  const terminalOutline = document.createElement("div");
+
+  preview.className = "tab-drag-preview";
+  preview.style.width = `${Math.max(tabElement.offsetWidth, 260)}px`;
+  tabClone.classList.add("tab-drag-preview-tab");
+  terminalOutline.className = "tab-drag-terminal-outline";
+
+  preview.append(tabClone, terminalOutline);
+  document.body.append(preview);
+
+  return preview;
+}
+
 async function stageDroppedFile(file: File) {
   const data = Array.from(new Uint8Array(await file.arrayBuffer()));
 
@@ -441,6 +457,7 @@ function TerminalSurface({
 export function TerminalPane() {
   const nextTabIndex = useRef(2);
   const terminalRefs = useRef(new Map<string, Terminal>());
+  const dragPreviewRef = useRef<HTMLElement | null>(null);
   const [config, setConfig] = useState<AppConfig>(defaultAppConfig);
   const [characters, setCharacters] = useState<Character[]>(defaultCharacters);
   const initialSession = useMemo<TerminalSession>(
@@ -454,13 +471,23 @@ export function TerminalPane() {
     []
   );
   const [sessions, setSessions] = useState<TerminalSession[]>([initialSession]);
+  const [tabOrder, setTabOrder] = useState<string[]>([initialSession.id]);
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
   const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
+  const sessionsById = useMemo(
+    () => new Map(sessions.map((session) => [session.id, session])),
+    [sessions]
+  );
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0];
   const activeCharacter = getCharacter(activeSession.characterId, characters);
   const canCreateSession = sessions.length < characters.length;
+
+  const removeDragPreview = useCallback(() => {
+    dragPreviewRef.current?.remove();
+    dragPreviewRef.current = null;
+  }, []);
 
   const handleTerminalReady = useCallback((sessionId: string, terminal: Terminal | null) => {
     if (terminal) {
@@ -487,6 +514,8 @@ export function TerminalPane() {
         console.error("Failed to load character definitions", error);
       });
   }, []);
+
+  useEffect(() => removeDragPreview, [removeDragPreview]);
 
   const updateTerminalFontSize = useCallback((fontSize: number) => {
     const nextFontSize = Math.max(minTerminalFontSize, Math.min(maxTerminalFontSize, fontSize));
@@ -645,36 +674,42 @@ export function TerminalPane() {
     };
 
     setSessions([...sessions, session]);
+    setTabOrder((currentOrder) => [...currentOrder, session.id]);
     setPickerSessionId(null);
     setActiveSessionId(session.id);
   };
 
   const closeSession = (sessionId: string) => {
     setPickerSessionId(null);
-    setSessions((currentSessions) => {
-      const closingIndex = currentSessions.findIndex((session) => session.id === sessionId);
-      const remainingSessions = currentSessions.filter((session) => session.id !== sessionId);
+    removeDragPreview();
 
-      if (remainingSessions.length === 0) {
-        const session: TerminalSession = {
-          id: crypto.randomUUID(),
-          title: "shell",
-          attention: "not_now",
-          characterId: getNextCharacterId([], characters),
-          lastOutputAt: null
-        };
-        nextTabIndex.current = 2;
-        setActiveSessionId(session.id);
-        return [session];
-      }
+    const closingIndex = tabOrder.indexOf(sessionId);
+    const remainingOrder = tabOrder.filter((candidateId) => candidateId !== sessionId);
+    const remainingSessions = sessions.filter((session) => session.id !== sessionId);
 
-      if (activeSessionId === sessionId) {
-        const nextIndex = Math.min(closingIndex, remainingSessions.length - 1);
-        setActiveSessionId(remainingSessions[nextIndex].id);
-      }
+    if (remainingSessions.length === 0) {
+      const session: TerminalSession = {
+        id: crypto.randomUUID(),
+        title: "shell",
+        attention: "not_now",
+        characterId: getNextCharacterId([], characters),
+        lastOutputAt: null
+      };
 
-      return remainingSessions;
-    });
+      nextTabIndex.current = 2;
+      setSessions([session]);
+      setTabOrder([session.id]);
+      setActiveSessionId(session.id);
+      return;
+    }
+
+    if (activeSessionId === sessionId) {
+      const nextIndex = Math.min(Math.max(closingIndex, 0), remainingOrder.length - 1);
+      setActiveSessionId(remainingOrder[nextIndex] ?? remainingSessions[0].id);
+    }
+
+    setSessions(remainingSessions);
+    setTabOrder(remainingOrder);
   };
 
   const replaceCharacter = useCallback((sessionId: string, characterId: CharacterId) => {
@@ -691,23 +726,23 @@ export function TerminalPane() {
     setPickerSessionId(null);
   }, []);
 
-  const moveSession = useCallback((sessionId: string, targetSessionId: string) => {
+  const moveTab = useCallback((sessionId: string, targetSessionId: string) => {
     if (sessionId === targetSessionId) {
       return;
     }
 
-    setSessions((currentSessions) => {
-      const fromIndex = currentSessions.findIndex((session) => session.id === sessionId);
-      const toIndex = currentSessions.findIndex((session) => session.id === targetSessionId);
+    setTabOrder((currentOrder) => {
+      const fromIndex = currentOrder.indexOf(sessionId);
+      const toIndex = currentOrder.indexOf(targetSessionId);
 
       if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) {
-        return currentSessions;
+        return currentOrder;
       }
 
-      const nextSessions = [...currentSessions];
-      const [movedSession] = nextSessions.splice(fromIndex, 1);
-      nextSessions.splice(toIndex, 0, movedSession);
-      return nextSessions;
+      const nextOrder = [...currentOrder];
+      const [movedSessionId] = nextOrder.splice(fromIndex, 1);
+      nextOrder.splice(toIndex, 0, movedSessionId);
+      return nextOrder;
     });
   }, []);
 
@@ -766,7 +801,13 @@ export function TerminalPane() {
       onDrop={handleWorkspaceDrop}
     >
       <div className="tab-bar" role="tablist" aria-label="Terminal tabs">
-        {sessions.map((session) => {
+        {tabOrder.map((sessionId) => {
+          const session = sessionsById.get(sessionId);
+
+          if (!session) {
+            return null;
+          }
+
           const character = getCharacter(session.characterId, characters);
           const isActive = session.id === activeSessionId;
           const tabTheme = character.theme.ui;
@@ -784,11 +825,12 @@ export function TerminalPane() {
 
                 event.preventDefault();
                 event.dataTransfer.dropEffect = "move";
-                moveSession(draggingSessionId, session.id);
+                moveTab(draggingSessionId, session.id);
               }}
               onDrop={(event) => {
                 event.preventDefault();
                 setDraggingSessionId(null);
+                removeDragPreview();
               }}
               style={
                 {
@@ -830,14 +872,16 @@ export function TerminalPane() {
                   event.dataTransfer.setData("text/plain", session.id);
 
                   if (tabElement instanceof HTMLElement) {
-                    event.dataTransfer.setDragImage(
-                      tabElement,
-                      tabElement.offsetWidth / 2,
-                      tabElement.offsetHeight / 2
-                    );
+                    removeDragPreview();
+                    const preview = createTabDragPreview(tabElement);
+                    dragPreviewRef.current = preview;
+                    event.dataTransfer.setDragImage(preview, preview.offsetWidth / 2, 24);
                   }
                 }}
-                onDragEnd={() => setDraggingSessionId(null)}
+                onDragEnd={() => {
+                  setDraggingSessionId(null);
+                  removeDragPreview();
+                }}
                 onClick={() => activateSession(session.id)}
               >
                 <span className="tab-name">{character.name}</span>
