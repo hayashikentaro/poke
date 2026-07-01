@@ -497,9 +497,33 @@ export function TerminalPane() {
       });
   }, []);
 
+  const copyActiveTerminalSelection = useCallback(() => {
+    const terminal = terminalRefs.current.get(activeSessionId);
+
+    if (!terminal?.hasSelection()) {
+      return false;
+    }
+
+    const selection = terminal.getSelection();
+
+    if (!selection) {
+      return false;
+    }
+
+    void navigator.clipboard.writeText(selection).catch((error: unknown) => {
+      console.error("Failed to copy terminal selection", error);
+    });
+    return true;
+  }, [activeSessionId]);
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (!event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (event.key.toLowerCase() === "c" && copyActiveTerminalSelection()) {
+        event.preventDefault();
         return;
       }
 
@@ -516,7 +540,7 @@ export function TerminalPane() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [config.terminal.fontSize, updateTerminalFontSize]);
+  }, [config.terminal.fontSize, copyActiveTerminalSelection, updateTerminalFontSize]);
 
   useEffect(() => {
     applyPokeUiTheme(activeCharacter.theme.ui);
