@@ -828,9 +828,15 @@ export function TerminalPane() {
                 moveTab(draggingSessionId, session.id);
               }}
               onDrop={(event) => {
+                const droppedSessionId = draggingSessionId;
+
                 event.preventDefault();
                 setDraggingSessionId(null);
                 removeDragPreview();
+
+                if (droppedSessionId) {
+                  activateSession(droppedSessionId);
+                }
               }}
               style={
                 {
