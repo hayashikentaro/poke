@@ -251,10 +251,10 @@ export const pokeCharacterThemes: Record<string, PokeCharacterTheme> = {
     "primary": "#BCA7FF",
     "theme": {
       "xterm": {
-        "background": "#1A1821",
+        "background": "#211E2A",
         "foreground": "#E8E3F3",
         "cursor": "#BCA7FF",
-        "cursorAccent": "#1A1821",
+        "cursorAccent": "#211E2A",
         "selectionBackground": "#363044",
         "black": "#151515",
         "red": "#FF6B6B",
@@ -274,11 +274,11 @@ export const pokeCharacterThemes: Record<string, PokeCharacterTheme> = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "terminalBackground": "#1A1821",
+        "terminalBackground": "#211E2A",
         "appBackground": "#121117",
         "panelBackground": "#181720",
-        "tabBackground": "#1A1821",
-        "activeTabBackground": "#1A1821",
+        "tabBackground": "#211E2A",
+        "activeTabBackground": "#211E2A",
         "activeTabBorder": "#BCA7FF",
         "tabHoverBackground": "#363044",
         "tabText": "#E8EBDD",

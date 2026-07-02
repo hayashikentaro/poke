@@ -137,7 +137,7 @@ const BUILT_IN_CHARACTERS: [BuiltInCharacter; 8] = [
         id: "nagi",
         name: "Nagi",
         primary: "#BCA7FF",
-        terminal_background: "#1A1821",
+        terminal_background: "#211E2A",
         icon_file: DEFAULT_CHARACTER_ICON_FILE,
         idle_file: DEFAULT_CHARACTER_IDLE_FILE,
         needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
