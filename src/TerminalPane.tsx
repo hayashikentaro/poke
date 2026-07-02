@@ -489,6 +489,30 @@ export function TerminalPane() {
     dragPreviewRef.current = null;
   }, []);
 
+  const handleTabDragStart = useCallback(
+    (event: React.DragEvent<HTMLElement>, sessionId: string) => {
+      const tabElement = event.currentTarget.closest(".tab-item");
+
+      setPickerSessionId(null);
+      setDraggingSessionId(sessionId);
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", sessionId);
+
+      if (tabElement instanceof HTMLElement) {
+        removeDragPreview();
+        const preview = createTabDragPreview(tabElement);
+        dragPreviewRef.current = preview;
+        event.dataTransfer.setDragImage(preview, preview.offsetWidth / 2, 24);
+      }
+    },
+    [removeDragPreview]
+  );
+
+  const handleTabDragEnd = useCallback(() => {
+    setDraggingSessionId(null);
+    removeDragPreview();
+  }, [removeDragPreview]);
+
   const handleTerminalReady = useCallback((sessionId: string, terminal: Terminal | null) => {
     if (terminal) {
       terminalRefs.current.set(sessionId, terminal);
@@ -853,6 +877,9 @@ export function TerminalPane() {
                 type="button"
                 className="tab-character-button"
                 aria-label={isActive ? `Change ${character.name}` : `Select ${character.name}`}
+                draggable
+                onDragStart={(event) => handleTabDragStart(event, session.id)}
+                onDragEnd={handleTabDragEnd}
                 onClick={() => {
                   if (isActive) {
                     setPickerSessionId(session.id);
@@ -869,25 +896,8 @@ export function TerminalPane() {
                 aria-selected={isActive}
                 className="tab-button"
                 draggable
-                onDragStart={(event) => {
-                  const tabElement = event.currentTarget.closest(".tab-item");
-
-                  setPickerSessionId(null);
-                  setDraggingSessionId(session.id);
-                  event.dataTransfer.effectAllowed = "move";
-                  event.dataTransfer.setData("text/plain", session.id);
-
-                  if (tabElement instanceof HTMLElement) {
-                    removeDragPreview();
-                    const preview = createTabDragPreview(tabElement);
-                    dragPreviewRef.current = preview;
-                    event.dataTransfer.setDragImage(preview, preview.offsetWidth / 2, 24);
-                  }
-                }}
-                onDragEnd={() => {
-                  setDraggingSessionId(null);
-                  removeDragPreview();
-                }}
+                onDragStart={(event) => handleTabDragStart(event, session.id)}
+                onDragEnd={handleTabDragEnd}
                 onClick={() => activateSession(session.id)}
               >
                 <span className="tab-name">{character.name}</span>
