@@ -119,83 +119,15 @@ In the app window, verify:
 
 Do not verify PTY behavior by opening the Vite dev server directly in a browser. Browser-only mode does not provide Tauri commands or events, so the Rust PTY backend cannot run there.
 
-## App Configuration
+## Configuration
 
-At runtime, Poke reads configuration from the app config directory:
-
-```sh
-~/Library/Application Support/com.poke.terminal/config.json
-```
-
-The file is created with defaults the first time the Tauri app runs. To change the terminal font size after building the app, edit:
-
-```json
-{
-  "terminal": {
-    "fontSize": 18
-  }
-}
-```
-
-Restart the app after editing the file manually.
-
-While the app is running, use `Command + +` or `Command + -` to change the terminal font size. The new size is saved to `config.json`.
-
-Development defaults live in `src/appConfig.ts`.
-
-## Character Customization
-
-Poke creates character customization folders in the app config directory:
+Poke creates editable runtime settings under:
 
 ```sh
-~/Library/Application Support/com.poke.terminal/characters/
+~/Library/Application Support/com.poke.terminal/
 ```
 
-On first run, Poke creates `character.json` files for the built-in characters in this directory. These files are the editable runtime character settings. Built-in app data is used only as a fallback when a runtime setting is missing or invalid.
-
-To replace a built-in character image or metadata, edit files in the matching character folder:
-
-```text
-characters/
-  kiri/
-    character.json
-    icon_32x32.png
-    idle_32x32_6f.png
-    needs_you_32x32_8f.png
-```
-
-`character.json` can override the display name and colors:
-
-```json
-{
-  "name": "Kiri",
-  "primary": "#b36df2",
-  "terminalBackground": "#201326"
-}
-```
-
-For built-in characters, image files are optional. If a value or image is missing, Poke uses the built-in definition for that part.
-
-To add a new character, create a new folder under `characters/` with:
-
-- `character.json`
-- `icon_32x32.png`
-- `idle_32x32_6f.png`
-- `needs_you_32x32_8f.png`
-
-New character folders can omit PNG files. Missing images use the built-in fallback character images.
-
-Restart the app after changing character files manually.
-
-Poke also creates a load-failure character setting:
-
-```text
-characters/
-  _load_failed/
-    character.json
-```
-
-This setting is used when an external character folder cannot be read as a normal character. The default failed-load character is `Void`. If multiple folders fail to load, Poke creates separate runtime entries such as `Void A` and `Void B` so each failed folder remains visible instead of collapsing into one character.
+See [Configuration](docs/configuration.md) for how to edit terminal settings, character names, character colors, and character images.
 
 ## Frontend-only development
 
