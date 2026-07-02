@@ -1,4 +1,4 @@
-# Poké
+# Poke
 
 Poke is a desktop terminal for people who run multiple AI agent CLIs and shell sessions in parallel.
 
