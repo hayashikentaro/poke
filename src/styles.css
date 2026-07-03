@@ -242,12 +242,11 @@ body {
   animation: tab-switch-overlay 520ms ease-out both;
 }
 
-.tab-switch-overlay .character-icon {
+.tab-switch-overlay .character-still-icon {
   width: min(50vw, 50vh);
   height: min(50vw, 50vh);
   opacity: 0.22;
-  animation: none;
-  background-size: auto 100%;
+  image-rendering: pixelated;
 }
 
 .character-icon {

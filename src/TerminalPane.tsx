@@ -79,7 +79,6 @@ type TerminalSurfaceProps = {
 type SwitchOverlay = {
   id: number;
   character: Character;
-  state: AttentionState;
 };
 
 const quietThresholdMs = 5000;
@@ -678,8 +677,7 @@ export function TerminalPane() {
         clearSwitchOverlayTimer();
         setSwitchOverlay({
           id: Date.now(),
-          character: getCharacter(nextSession.characterId, characters),
-          state: nextSession.attention
+          character: getCharacter(nextSession.characterId, characters)
         });
         switchOverlayTimerRef.current = window.setTimeout(() => {
           setSwitchOverlay(null);
@@ -980,7 +978,7 @@ export function TerminalPane() {
         ) : null}
         {switchOverlay ? (
           <div key={switchOverlay.id} className="tab-switch-overlay" aria-hidden="true">
-            <CharacterIcon character={switchOverlay.character} state={switchOverlay.state} />
+            <CharacterStillIcon character={switchOverlay.character} />
           </div>
         ) : null}
         {sessions.map((session) => (
@@ -1014,6 +1012,10 @@ function CharacterIcon({ character, state }: { character: Character; state: Atte
       aria-hidden="true"
     />
   );
+}
+
+function CharacterStillIcon({ character }: { character: Character }) {
+  return <img className="character-still-icon" src={character.images.icon} alt="" draggable="false" />;
 }
 
 function CharacterPicker({
