@@ -76,6 +76,12 @@ type TerminalSurfaceProps = {
   session: TerminalSession;
 };
 
+type SwitchOverlay = {
+  id: number;
+  character: Character;
+  state: AttentionState;
+};
+
 const quietThresholdMs = 5000;
 const skinBasePath = "/skins/default-poke-crew/characters";
 const minTerminalFontSize = 10;
@@ -458,6 +464,7 @@ export function TerminalPane() {
   const nextTabIndex = useRef(2);
   const terminalRefs = useRef(new Map<string, Terminal>());
   const dragPreviewRef = useRef<HTMLElement | null>(null);
+  const switchOverlayTimerRef = useRef<number | null>(null);
   const [config, setConfig] = useState<AppConfig>(defaultAppConfig);
   const [characters, setCharacters] = useState<Character[]>(defaultCharacters);
   const initialSession = useMemo<TerminalSession>(
@@ -475,6 +482,7 @@ export function TerminalPane() {
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
   const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
+  const [switchOverlay, setSwitchOverlay] = useState<SwitchOverlay | null>(null);
   const sessionsById = useMemo(
     () => new Map(sessions.map((session) => [session.id, session])),
     [sessions]
@@ -487,6 +495,15 @@ export function TerminalPane() {
   const removeDragPreview = useCallback(() => {
     dragPreviewRef.current?.remove();
     dragPreviewRef.current = null;
+  }, []);
+
+  const clearSwitchOverlayTimer = useCallback(() => {
+    if (switchOverlayTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(switchOverlayTimerRef.current);
+    switchOverlayTimerRef.current = null;
   }, []);
 
   const handleTabDragStart = useCallback(
@@ -540,6 +557,13 @@ export function TerminalPane() {
   }, []);
 
   useEffect(() => removeDragPreview, [removeDragPreview]);
+
+  useEffect(
+    () => () => {
+      clearSwitchOverlayTimer();
+    },
+    [clearSwitchOverlayTimer]
+  );
 
   const updateTerminalFontSize = useCallback((fontSize: number) => {
     const nextFontSize = Math.max(minTerminalFontSize, Math.min(maxTerminalFontSize, fontSize));
@@ -638,20 +662,44 @@ export function TerminalPane() {
     return () => window.clearInterval(timer);
   }, [activeSessionId]);
 
-  const activateSession = useCallback((sessionId: string) => {
-    setPickerSessionId(null);
-    setActiveSessionId(sessionId);
-    setSessions((currentSessions) =>
-      currentSessions.map((session) =>
-        session.id === sessionId
-          ? {
-              ...session,
-              attention: "not_now"
-            }
-          : session
-      )
-    );
-  }, []);
+  const activateSession = useCallback(
+    (sessionId: string) => {
+      if (sessionId === activeSessionId) {
+        setPickerSessionId(null);
+        return;
+      }
+
+      const nextSession = sessionsById.get(sessionId);
+
+      setPickerSessionId(null);
+      setActiveSessionId(sessionId);
+
+      if (nextSession) {
+        clearSwitchOverlayTimer();
+        setSwitchOverlay({
+          id: Date.now(),
+          character: getCharacter(nextSession.characterId, characters),
+          state: nextSession.attention
+        });
+        switchOverlayTimerRef.current = window.setTimeout(() => {
+          setSwitchOverlay(null);
+          switchOverlayTimerRef.current = null;
+        }, 520);
+      }
+
+      setSessions((currentSessions) =>
+        currentSessions.map((session) =>
+          session.id === sessionId
+            ? {
+                ...session,
+                attention: "not_now"
+              }
+            : session
+        )
+      );
+    },
+    [activeSessionId, characters, clearSwitchOverlayTimer, sessionsById]
+  );
 
   const handleSessionOutput = useCallback((sessionId: string) => {
     const now = Date.now();
@@ -929,6 +977,11 @@ export function TerminalPane() {
             onClose={() => setPickerSessionId(null)}
             onSelect={(characterId) => replaceCharacter(pickerSession.id, characterId)}
           />
+        ) : null}
+        {switchOverlay ? (
+          <div key={switchOverlay.id} className="tab-switch-overlay" aria-hidden="true">
+            <CharacterIcon character={switchOverlay.character} state={switchOverlay.state} />
+          </div>
         ) : null}
         {sessions.map((session) => (
           <TerminalSurface
