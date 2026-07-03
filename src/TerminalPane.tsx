@@ -529,6 +529,21 @@ export function TerminalPane() {
     removeDragPreview();
   }, [removeDragPreview]);
 
+  const showSwitchOverlay = useCallback(
+    (character: Character) => {
+      clearSwitchOverlayTimer();
+      setSwitchOverlay({
+        id: Date.now(),
+        character
+      });
+      switchOverlayTimerRef.current = window.setTimeout(() => {
+        setSwitchOverlay(null);
+        switchOverlayTimerRef.current = null;
+      }, 520);
+    },
+    [clearSwitchOverlayTimer]
+  );
+
   const handleTerminalReady = useCallback((sessionId: string, terminal: Terminal | null) => {
     if (terminal) {
       terminalRefs.current.set(sessionId, terminal);
@@ -665,6 +680,12 @@ export function TerminalPane() {
     (sessionId: string) => {
       if (sessionId === activeSessionId) {
         setPickerSessionId(null);
+        const currentSession = sessionsById.get(sessionId);
+
+        if (currentSession) {
+          showSwitchOverlay(getCharacter(currentSession.characterId, characters));
+        }
+
         return;
       }
 
@@ -674,15 +695,7 @@ export function TerminalPane() {
       setActiveSessionId(sessionId);
 
       if (nextSession) {
-        clearSwitchOverlayTimer();
-        setSwitchOverlay({
-          id: Date.now(),
-          character: getCharacter(nextSession.characterId, characters)
-        });
-        switchOverlayTimerRef.current = window.setTimeout(() => {
-          setSwitchOverlay(null);
-          switchOverlayTimerRef.current = null;
-        }, 520);
+        showSwitchOverlay(getCharacter(nextSession.characterId, characters));
       }
 
       setSessions((currentSessions) =>
@@ -696,7 +709,7 @@ export function TerminalPane() {
         )
       );
     },
-    [activeSessionId, characters, clearSwitchOverlayTimer, sessionsById]
+    [activeSessionId, characters, sessionsById, showSwitchOverlay]
   );
 
   const handleSessionOutput = useCallback((sessionId: string) => {
@@ -928,6 +941,7 @@ export function TerminalPane() {
                 onDragEnd={handleTabDragEnd}
                 onClick={() => {
                   if (isActive) {
+                    showSwitchOverlay(character);
                     setPickerSessionId(session.id);
                   } else {
                     activateSession(session.id);
