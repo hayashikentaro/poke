@@ -157,7 +157,7 @@ export const pokeCharacterThemes: Record<string, PokeCharacterTheme> = {
     "primary": "#FFB4D6",
     "theme": {
       "xterm": {
-        "background": "#21191C",
+        "background": "#2A2024",
         "foreground": "#F2E3EA",
         "cursor": "#FFB4D6",
         "cursorAccent": "#21191C",
@@ -180,7 +180,7 @@ export const pokeCharacterThemes: Record<string, PokeCharacterTheme> = {
         "brightWhite": "#FFFFFF"
       },
       "ui": {
-        "terminalBackground": "#21191C",
+        "terminalBackground": "#2A2024",
         "appBackground": "#171113",
         "panelBackground": "#21191C",
         "tabBackground": "#21191C",

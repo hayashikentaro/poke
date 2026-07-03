@@ -119,7 +119,7 @@ const BUILT_IN_CHARACTERS: [BuiltInCharacter; 8] = [
         id: "kiku",
         name: "Kiku",
         primary: "#FFB4D6",
-        terminal_background: "#21191C",
+        terminal_background: "#2A2024",
         icon_file: DEFAULT_CHARACTER_ICON_FILE,
         idle_file: DEFAULT_CHARACTER_IDLE_FILE,
         needs_you_file: DEFAULT_CHARACTER_NEEDS_YOU_FILE,
