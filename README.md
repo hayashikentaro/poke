@@ -17,6 +17,7 @@ Poke treats each terminal session as something you can recognize at a glance:
 - Characters help identify sessions faster than text-only tab titles.
 - Per-character colors make terminal backgrounds visually distinct.
 - Attention state gives a small visual signal when a background session may need input.
+- Terminal links make URLs and local file paths clickable without changing shell output.
 - Real PTY-backed tabs keep the app usable as a normal terminal, not a wrapper around agent-specific features.
 
 The product direction is to support human attention around AI agent CLI workflows while staying a normal terminal.
@@ -40,6 +41,8 @@ This is an unsigned macOS app. If macOS blocks the first launch, open it from Fi
 - Lightweight attention state for quiet background sessions
 - Character picker and external character customization
 - Drag-and-drop tab reordering
+- Clickable terminal links for web URLs, localhost URLs, `file://` URLs, absolute paths, and `~/` paths
+- Local file hover previews for images, text-like files, and directories under your home directory
 - Runtime terminal font size changes with `Command + +` and `Command + -`
 
 Poke does not currently implement AI itself. It is meant to help humans operate AI agent CLIs and normal shells more safely in parallel. Notifications, persistence for tabs, command palette, and settings UI are intentionally not implemented yet.
@@ -114,6 +117,8 @@ In the app window, verify:
 - Clicking a character opens the character picker.
 - A non-active tab switches to the `needs_you` sprite after 5 seconds without output.
 - Activating a `needs_you` tab resets it to the idle sprite.
+- Terminal output links open for `https://example.com`, `localhost:1420`, `file:///Users/...`, absolute paths, and `~/...` paths.
+- Hovering local file links shows a preview for text files, images, and directories.
 - Resizing the window keeps the terminal usable.
 - Closing the app exits the shell session cleanly.
 
