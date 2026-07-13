@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { homeDir } from "@tauri-apps/api/path";
 import { openPath, openUrl } from "@tauri-apps/plugin-opener";
 import { FitAddon } from "@xterm/addon-fit";
 import { Unicode11Addon } from "@xterm/addon-unicode11";
@@ -87,8 +88,8 @@ const skinBasePath = "/skins/default-poke-crew/characters";
 const minTerminalFontSize = 10;
 const maxTerminalFontSize = 32;
 const terminalInputEncoder = new TextEncoder();
-const terminalUrlPattern =
-  /\b(?:(?:https?:\/\/|file:\/\/|www\.)[^\s<>"'`]+|(?:(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|\[[0-9a-fA-F:.]+\]):\d{1,5})(?:\/[^\s<>"'`]*)?)/gi;
+const terminalLinkPattern =
+  /(^|[\s([{<])((?:(?:https?:\/\/|file:\/\/|www\.)[^\s<>"'`]+|(?:(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|\[[0-9a-fA-F:.]+\]):\d{1,5})(?:\/[^\s<>"'`]*)?|(?:~\/|\/)[^\s<>"'`]+))/gi;
 const trailingUrlPunctuation = /[),.;:!?}\]>]+$/;
 
 function spriteCharacter(id: CharacterId): Character {
@@ -309,11 +310,33 @@ function getFileUrlPath(text: string) {
   }
 }
 
-function openTerminalLink(text: string) {
+async function getTerminalPath(text: string) {
   const filePath = getFileUrlPath(text);
 
   if (filePath) {
-    return openPath(filePath);
+    return filePath;
+  }
+
+  if (text.startsWith("/")) {
+    return text;
+  }
+
+  if (text === "~") {
+    return homeDir();
+  }
+
+  if (text.startsWith("~/")) {
+    return `${(await homeDir()).replace(/\/$/, "")}/${text.slice(2)}`;
+  }
+
+  return null;
+}
+
+async function openTerminalLink(text: string) {
+  const path = await getTerminalPath(text);
+
+  if (path) {
+    return openPath(path);
   }
 
   return openUrl(normalizeTerminalUrl(text));
@@ -328,18 +351,18 @@ function createTerminalUrlLinks(terminal: Terminal, bufferLineNumber: number) {
   }
 
   const links: ILink[] = [];
-  const matcher = new RegExp(terminalUrlPattern);
+  const matcher = new RegExp(terminalLinkPattern);
   let match: RegExpExecArray | null;
 
   while ((match = matcher.exec(text)) !== null) {
-    const rawText = match[0];
+    const rawText = match[2];
     const linkText = trimTerminalUrlText(rawText);
 
     if (!linkText) {
       continue;
     }
 
-    const startIndex = match.index;
+    const startIndex = match.index + match[1].length;
     const endIndex = startIndex + linkText.length;
 
     links.push({
