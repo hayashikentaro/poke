@@ -83,6 +83,16 @@ type SwitchOverlay = {
   character: Character;
 };
 
+type LocalLinkPreview = {
+  kind: "directory" | "image" | "text" | "unknown";
+  title: string;
+  subtitle: string;
+  mimeType: string | null;
+  data: number[] | null;
+  lines: string[] | null;
+  entries: string[] | null;
+};
+
 const quietThresholdMs = 5000;
 const skinBasePath = "/skins/default-poke-crew/characters";
 const minTerminalFontSize = 10;
@@ -91,6 +101,11 @@ const terminalInputEncoder = new TextEncoder();
 const terminalLinkPattern =
   /(^|[\s([{<])((?:(?:https?:\/\/|file:\/\/|www\.)[^\s<>"'`]+|(?:(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|\[[0-9a-fA-F:.]+\]):\d{1,5})(?:\/[^\s<>"'`]*)?|(?:~\/|\/)[^\s<>"'`]+))/gi;
 const trailingUrlPunctuation = /[),.;:!?}\]>]+$/;
+const localLinkPreviewCache = new Map<string, LocalLinkPreview>();
+let localLinkPreviewTimer: number | null = null;
+let localLinkPreviewRequestId = 0;
+let localLinkPreviewElement: HTMLDivElement | null = null;
+let localLinkPreviewObjectUrl: string | null = null;
 
 function spriteCharacter(id: CharacterId): Character {
   const basePath = `${skinBasePath}/${id}`;
@@ -342,6 +357,120 @@ async function openTerminalLink(text: string) {
   return openUrl(normalizeTerminalUrl(text));
 }
 
+function clearLocalLinkPreviewTimer() {
+  if (localLinkPreviewTimer !== null) {
+    window.clearTimeout(localLinkPreviewTimer);
+    localLinkPreviewTimer = null;
+  }
+}
+
+function hideLocalLinkPreview() {
+  localLinkPreviewRequestId += 1;
+  clearLocalLinkPreviewTimer();
+  localLinkPreviewElement?.remove();
+  localLinkPreviewElement = null;
+
+  if (localLinkPreviewObjectUrl) {
+    URL.revokeObjectURL(localLinkPreviewObjectUrl);
+    localLinkPreviewObjectUrl = null;
+  }
+}
+
+function positionLocalLinkPreview(element: HTMLElement, x: number, y: number) {
+  const margin = 12;
+  const width = Math.min(320, window.innerWidth - margin * 2);
+  element.style.maxWidth = `${width}px`;
+  element.style.left = `${Math.min(x + 14, window.innerWidth - width - margin)}px`;
+  element.style.top = `${Math.min(y + 18, window.innerHeight - element.offsetHeight - margin)}px`;
+}
+
+function renderLocalLinkPreview(preview: LocalLinkPreview, path: string, x: number, y: number) {
+  hideLocalLinkPreview();
+
+  const element = document.createElement("div");
+  const title = document.createElement("div");
+  const subtitle = document.createElement("div");
+
+  element.className = "terminal-link-preview xterm-hover";
+  title.className = "terminal-link-preview-title";
+  title.textContent = preview.title || path;
+  subtitle.className = "terminal-link-preview-subtitle";
+  subtitle.textContent = preview.subtitle || path;
+
+  element.append(title, subtitle);
+
+  if (preview.kind === "image" && preview.data && preview.mimeType) {
+    const image = document.createElement("img");
+    const blob = new Blob([Uint8Array.from(preview.data)], { type: preview.mimeType });
+    localLinkPreviewObjectUrl = URL.createObjectURL(blob);
+    image.src = localLinkPreviewObjectUrl;
+    image.alt = "";
+    image.className = "terminal-link-preview-image";
+    element.append(image);
+  } else if (preview.kind === "text" && preview.lines) {
+    const pre = document.createElement("pre");
+    pre.className = "terminal-link-preview-text";
+    pre.textContent = preview.lines.join("\n") || "(empty file)";
+    element.append(pre);
+  } else if (preview.kind === "directory" && preview.entries) {
+    const list = document.createElement("ul");
+    list.className = "terminal-link-preview-list";
+
+    for (const entry of preview.entries) {
+      const item = document.createElement("li");
+      item.textContent = entry;
+      list.append(item);
+    }
+
+    if (preview.entries.length === 0) {
+      const item = document.createElement("li");
+      item.textContent = "(empty directory)";
+      list.append(item);
+    }
+
+    element.append(list);
+  }
+
+  document.body.append(element);
+  localLinkPreviewElement = element;
+  positionLocalLinkPreview(element, x, y);
+}
+
+function showLocalLinkPreview(event: MouseEvent, text: string) {
+  const x = event.clientX;
+  const y = event.clientY;
+  const requestId = localLinkPreviewRequestId + 1;
+  localLinkPreviewRequestId = requestId;
+  clearLocalLinkPreviewTimer();
+
+  localLinkPreviewTimer = window.setTimeout(() => {
+    void (async () => {
+      const path = await getTerminalPath(text);
+
+      if (!path || requestId !== localLinkPreviewRequestId) {
+        return;
+      }
+
+      let preview = localLinkPreviewCache.get(path);
+
+      if (!preview) {
+        preview = await invoke<LocalLinkPreview>("get_link_preview", { path }).then((result) => {
+          localLinkPreviewCache.set(path, result);
+          return result;
+        });
+      }
+
+      if (!preview) {
+        return;
+      }
+
+      if (requestId === localLinkPreviewRequestId) {
+        renderLocalLinkPreview(preview, path, x, y);
+      }
+    })().catch(() => undefined);
+  }, 250);
+}
+
 function createTerminalUrlLinks(terminal: Terminal, bufferLineNumber: number) {
   const line = terminal.buffer.active.getLine(bufferLineNumber - 1);
   const text = line?.translateToString(true);
@@ -376,9 +505,16 @@ function createTerminalUrlLinks(terminal: Terminal, bufferLineNumber: number) {
         underline: true
       },
       activate: () => {
+        hideLocalLinkPreview();
         void openTerminalLink(linkText).catch((error: unknown) => {
           console.error("Failed to open terminal URL", error);
         });
+      },
+      hover: (event) => {
+        showLocalLinkPreview(event, linkText);
+      },
+      leave: () => {
+        hideLocalLinkPreview();
       }
     });
   }

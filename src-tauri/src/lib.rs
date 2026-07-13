@@ -4,7 +4,7 @@ use std::{
     collections::{HashMap, HashSet},
     env, fs,
     io::{Read, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::{Arc, Mutex},
     thread,
     time::{SystemTime, UNIX_EPOCH},
@@ -32,6 +32,18 @@ struct SessionOutput {
 struct SessionExit {
     id: String,
     code: Option<i32>,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct LinkPreview {
+    kind: String,
+    title: String,
+    subtitle: String,
+    mime_type: Option<String>,
+    data: Option<Vec<u8>>,
+    lines: Option<Vec<String>>,
+    entries: Option<Vec<String>>,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -469,6 +481,162 @@ fn close_session(state: State<'_, TerminalState>, id: String) -> Result<(), Stri
     Ok(())
 }
 
+#[tauri::command]
+fn get_link_preview(path: String) -> Result<LinkPreview, String> {
+    let path = PathBuf::from(path);
+    let home_dir = env::var("HOME")
+        .map(PathBuf::from)
+        .map_err(|_| "home directory unavailable".to_string())?;
+    let home_dir = home_dir
+        .canonicalize()
+        .map_err(|error| format!("failed to resolve home directory: {error}"))?;
+    let canonical_path = path
+        .canonicalize()
+        .map_err(|error| format!("failed to resolve path: {error}"))?;
+
+    if !canonical_path.starts_with(&home_dir) {
+        return Err("path is outside the home directory".to_string());
+    }
+
+    let metadata = fs::metadata(&canonical_path).map_err(|error| error.to_string())?;
+    let title = canonical_path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .map_or_else(|| canonical_path.to_string_lossy().to_string(), String::from);
+
+    if metadata.is_dir() {
+        let entries = read_preview_directory_entries(&canonical_path)?;
+
+        return Ok(LinkPreview {
+            kind: "directory".to_string(),
+            title,
+            subtitle: canonical_path.to_string_lossy().to_string(),
+            mime_type: None,
+            data: None,
+            lines: None,
+            entries: Some(entries),
+        });
+    }
+
+    let extension = canonical_path
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .unwrap_or("")
+        .to_ascii_lowercase();
+
+    if let Some(mime_type) = image_mime_type(&extension) {
+        let data = fs::read(&canonical_path).map_err(|error| error.to_string())?;
+
+        if data.len() > 5 * 1024 * 1024 {
+            return Ok(unknown_file_preview(title, &canonical_path, metadata.len()));
+        }
+
+        return Ok(LinkPreview {
+            kind: "image".to_string(),
+            title,
+            subtitle: format_file_size(metadata.len()),
+            mime_type: Some(mime_type.to_string()),
+            data: Some(data),
+            lines: None,
+            entries: None,
+        });
+    }
+
+    if is_text_preview_extension(&extension) {
+        let text = read_preview_text(&canonical_path)?;
+
+        return Ok(LinkPreview {
+            kind: "text".to_string(),
+            title,
+            subtitle: format_file_size(metadata.len()),
+            mime_type: None,
+            data: None,
+            lines: Some(text),
+            entries: None,
+        });
+    }
+
+    Ok(unknown_file_preview(title, &canonical_path, metadata.len()))
+}
+
+fn read_preview_directory_entries(path: &Path) -> Result<Vec<String>, String> {
+    let mut entries = Vec::new();
+
+    for entry in fs::read_dir(path).map_err(|error| error.to_string())?.take(8) {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let name = entry.file_name().to_string_lossy().to_string();
+        let suffix = if entry.path().is_dir() { "/" } else { "" };
+        entries.push(format!("{name}{suffix}"));
+    }
+
+    Ok(entries)
+}
+
+fn read_preview_text(path: &Path) -> Result<Vec<String>, String> {
+    let mut file = fs::File::open(path).map_err(|error| error.to_string())?;
+    let mut buffer = Vec::new();
+    std::io::Read::by_ref(&mut file)
+        .take(64 * 1024)
+        .read_to_end(&mut buffer)
+        .map_err(|error| error.to_string())?;
+    let text = String::from_utf8_lossy(&buffer);
+
+    Ok(text.lines().take(8).map(|line| line.to_string()).collect())
+}
+
+fn image_mime_type(extension: &str) -> Option<&'static str> {
+    match extension {
+        "gif" => Some("image/gif"),
+        "jpg" | "jpeg" => Some("image/jpeg"),
+        "png" => Some("image/png"),
+        "webp" => Some("image/webp"),
+        _ => None,
+    }
+}
+
+fn is_text_preview_extension(extension: &str) -> bool {
+    matches!(
+        extension,
+        "css"
+            | "csv"
+            | "json"
+            | "log"
+            | "md"
+            | "rs"
+            | "sh"
+            | "toml"
+            | "ts"
+            | "tsx"
+            | "txt"
+            | "yaml"
+            | "yml"
+    )
+}
+
+fn unknown_file_preview(title: String, path: &Path, size: u64) -> LinkPreview {
+    LinkPreview {
+        kind: "unknown".to_string(),
+        title,
+        subtitle: format!("{} · {}", path.to_string_lossy(), format_file_size(size)),
+        mime_type: None,
+        data: None,
+        lines: None,
+        entries: None,
+    }
+}
+
+fn format_file_size(size: u64) -> String {
+    if size < 1024 {
+        return format!("{size} B");
+    }
+
+    if size < 1024 * 1024 {
+        return format!("{:.1} KB", size as f64 / 1024.0);
+    }
+
+    format!("{:.1} MB", size as f64 / 1024.0 / 1024.0)
+}
+
 fn close_all_sessions(state: State<'_, TerminalState>) {
     let sessions = state.sessions.lock().ok().map(|mut sessions| {
         sessions
@@ -498,7 +666,8 @@ pub fn run() {
             create_session,
             write_to_session,
             resize_session,
-            close_session
+            close_session,
+            get_link_preview
         ])
         .on_window_event(|window, event| {
             if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
