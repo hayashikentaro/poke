@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { openPath, openUrl } from "@tauri-apps/plugin-opener";
 import { FitAddon } from "@xterm/addon-fit";
 import { Unicode11Addon } from "@xterm/addon-unicode11";
-import { Terminal } from "@xterm/xterm";
+import { Terminal, type ILink } from "@xterm/xterm";
 import {
   applyPokeUiTheme,
   pokeCharacterThemes,
@@ -86,6 +87,9 @@ const skinBasePath = "/skins/default-poke-crew/characters";
 const minTerminalFontSize = 10;
 const maxTerminalFontSize = 32;
 const terminalInputEncoder = new TextEncoder();
+const terminalUrlPattern =
+  /\b(?:(?:https?:\/\/|file:\/\/|www\.)[^\s<>"'`]+|(?:(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|\[[0-9a-fA-F:.]+\]):\d{1,5})(?:\/[^\s<>"'`]*)?)/gi;
+const trailingUrlPunctuation = /[),.;:!?}\]>]+$/;
 
 function spriteCharacter(id: CharacterId): Character {
   const basePath = `${skinBasePath}/${id}`;
@@ -263,6 +267,102 @@ function shellQuotePath(path: string) {
   return `'${path.split("'").join("'\\''")}'`;
 }
 
+function trimTerminalUrlText(text: string) {
+  let trimmed = text;
+
+  while (trailingUrlPunctuation.test(trimmed)) {
+    const next = trimmed.replace(trailingUrlPunctuation, "");
+
+    if (next === trimmed) {
+      break;
+    }
+
+    trimmed = next;
+  }
+
+  return trimmed;
+}
+
+function normalizeTerminalUrl(text: string) {
+  if (/^https?:\/\//i.test(text)) {
+    return text;
+  }
+
+  if (/^www\./i.test(text)) {
+    return `https://${text}`;
+  }
+
+  return `http://${text}`;
+}
+
+function getFileUrlPath(text: string) {
+  try {
+    const url = new URL(text);
+
+    if (url.protocol !== "file:") {
+      return null;
+    }
+
+    return decodeURIComponent(url.pathname);
+  } catch {
+    return null;
+  }
+}
+
+function openTerminalLink(text: string) {
+  const filePath = getFileUrlPath(text);
+
+  if (filePath) {
+    return openPath(filePath);
+  }
+
+  return openUrl(normalizeTerminalUrl(text));
+}
+
+function createTerminalUrlLinks(terminal: Terminal, bufferLineNumber: number) {
+  const line = terminal.buffer.active.getLine(bufferLineNumber - 1);
+  const text = line?.translateToString(true);
+
+  if (!text) {
+    return undefined;
+  }
+
+  const links: ILink[] = [];
+  const matcher = new RegExp(terminalUrlPattern);
+  let match: RegExpExecArray | null;
+
+  while ((match = matcher.exec(text)) !== null) {
+    const rawText = match[0];
+    const linkText = trimTerminalUrlText(rawText);
+
+    if (!linkText) {
+      continue;
+    }
+
+    const startIndex = match.index;
+    const endIndex = startIndex + linkText.length;
+
+    links.push({
+      range: {
+        start: { x: startIndex + 1, y: bufferLineNumber },
+        end: { x: endIndex, y: bufferLineNumber }
+      },
+      text: linkText,
+      decorations: {
+        pointerCursor: true,
+        underline: true
+      },
+      activate: () => {
+        void openTerminalLink(linkText).catch((error: unknown) => {
+          console.error("Failed to open terminal URL", error);
+        });
+      }
+    });
+  }
+
+  return links.length > 0 ? links : undefined;
+}
+
 function hasDraggedFiles(dataTransfer: DataTransfer) {
   return Array.from(dataTransfer.types).includes("Files");
 }
@@ -320,14 +420,20 @@ function TerminalSurface({
     terminalRef.current = terminal;
     fitAddonRef.current = fitAddon;
     onTerminalReady(session.id, terminal);
-    terminal.loadAddon(unicode11Addon);
-    terminal.unicode.activeVersion = "11";
-    terminal.loadAddon(fitAddon);
-    terminal.open(container);
-
     let disposed = false;
     let resizeObserver: ResizeObserver | null = null;
     const cleanupTasks: Array<() => void> = [];
+
+    terminal.loadAddon(unicode11Addon);
+    terminal.unicode.activeVersion = "11";
+    terminal.loadAddon(fitAddon);
+    const linkDisposable = terminal.registerLinkProvider({
+      provideLinks(bufferLineNumber, callback) {
+        callback(createTerminalUrlLinks(terminal, bufferLineNumber));
+      }
+    });
+    cleanupTasks.push(() => linkDisposable.dispose());
+    terminal.open(container);
 
     const fitAndResize = () => {
       if (!container.offsetParent) {

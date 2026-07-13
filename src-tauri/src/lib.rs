@@ -488,6 +488,7 @@ fn close_all_sessions(state: State<'_, TerminalState>) {
 
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .manage(TerminalState::default())
         .invoke_handler(tauri::generate_handler![
             get_app_config,
