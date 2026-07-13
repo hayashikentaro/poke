@@ -2,5 +2,12 @@
   "identifier": "default",
   "description": "Default capability for the main app window",
   "windows": ["main"],
-  "permissions": ["core:default", "opener:default", "opener:allow-open-path"]
+  "permissions": [
+    "core:default",
+    "opener:default",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [{ "path": "$HOME/**" }]
+    }
+  ]
 }
