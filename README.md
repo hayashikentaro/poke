@@ -32,6 +32,12 @@ Unzip the file, then open `Poke.app`.
 
 This is an unsigned macOS app. If macOS blocks the first launch, open it from Finder with right click, then `Open`.
 
+Poke is still a prototype. Depending on your macOS Gatekeeper settings, you may need to remove the quarantine attribute after unzipping:
+
+```sh
+xattr -dr com.apple.quarantine Poke.app
+```
+
 ## Features
 
 - Real shell sessions backed by a Rust PTY
