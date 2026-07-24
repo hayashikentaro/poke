@@ -745,6 +745,7 @@ export function TerminalPane() {
   const [tabOrder, setTabOrder] = useState<string[]>([initialSession.id]);
   const [activeSessionId, setActiveSessionId] = useState(initialSession.id);
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
+  const [closeConfirmSessionId, setCloseConfirmSessionId] = useState<string | null>(null);
   const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
   const [switchOverlay, setSwitchOverlay] = useState<SwitchOverlay | null>(null);
   const sessionsById = useMemo(
@@ -1029,6 +1030,7 @@ export function TerminalPane() {
 
   const closeSession = (sessionId: string) => {
     setPickerSessionId(null);
+    setCloseConfirmSessionId(null);
     removeDragPreview();
 
     const closingIndex = tabOrder.indexOf(sessionId);
@@ -1058,6 +1060,11 @@ export function TerminalPane() {
 
     setSessions(remainingSessions);
     setTabOrder(remainingOrder);
+  };
+
+  const requestCloseSession = (sessionId: string) => {
+    setPickerSessionId(null);
+    setCloseConfirmSessionId(sessionId);
   };
 
   const replaceCharacter = useCallback((sessionId: string, characterId: CharacterId) => {
@@ -1140,6 +1147,8 @@ export function TerminalPane() {
   );
 
   const pickerSession = sessions.find((session) => session.id === pickerSessionId) ?? null;
+  const closeConfirmSession =
+    sessions.find((session) => session.id === closeConfirmSessionId) ?? null;
 
   return (
     <section
@@ -1231,7 +1240,7 @@ export function TerminalPane() {
                 type="button"
                 className="tab-close"
                 aria-label={`Close ${character.name}`}
-                onClick={() => closeSession(session.id)}
+                onClick={() => requestCloseSession(session.id)}
               >
                 x
               </button>
@@ -1255,6 +1264,14 @@ export function TerminalPane() {
             onSelect={(characterId) => replaceCharacter(pickerSession.id, characterId)}
           />
         ) : null}
+        {closeConfirmSession ? (
+          <CloseSessionConfirm
+            character={getCharacter(closeConfirmSession.characterId, characters)}
+            session={closeConfirmSession}
+            onCancel={() => setCloseConfirmSessionId(null)}
+            onConfirm={() => closeSession(closeConfirmSession.id)}
+          />
+        ) : null}
         {switchOverlay ? (
           <div key={switchOverlay.id} className="tab-switch-overlay" aria-hidden="true">
             <CharacterStillIcon character={switchOverlay.character} />
@@ -1274,6 +1291,67 @@ export function TerminalPane() {
         ))}
       </div>
     </section>
+  );
+}
+
+function CloseSessionConfirm({
+  character,
+  onCancel,
+  onConfirm,
+  session
+}: {
+  character: Character;
+  onCancel: () => void;
+  onConfirm: () => void;
+  session: TerminalSession;
+}) {
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCancel();
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        onConfirm();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onCancel, onConfirm]);
+
+  return (
+    <div className="picker-layer" aria-modal="true" role="dialog" aria-label="Close session" onMouseDown={onCancel}>
+      <div className="character-picker close-confirm" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="picker-header">
+          <div className="picker-title">CLOSE SESSION</div>
+          <button type="button" className="picker-close" aria-label="Cancel close session" onClick={onCancel}>
+            x
+          </button>
+        </div>
+        <div className="close-confirm-body">
+          <CharacterIcon character={character} state={session.attention} />
+          <div className="close-confirm-copy">
+            <div className="close-confirm-name">{character.name}</div>
+            <div className="close-confirm-message">このセッションを閉じますか？</div>
+          </div>
+        </div>
+        <div className="close-confirm-actions">
+          <button
+            type="button"
+            className="close-confirm-action close-confirm-cancel picker-highlighted"
+            onClick={onCancel}
+          >
+            CANCEL
+          </button>
+          <button type="button" className="close-confirm-action close-confirm-danger" onClick={onConfirm}>
+            CLOSE
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

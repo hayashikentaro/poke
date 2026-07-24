@@ -478,3 +478,63 @@ body {
   color: var(--poke-muted-text);
   text-align: right;
 }
+
+.close-confirm {
+  width: min(360px, 100%);
+}
+
+.close-confirm-body {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 4px 4px 14px;
+}
+
+.close-confirm-copy {
+  min-width: 0;
+}
+
+.close-confirm-name {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close-confirm-message {
+  margin-top: 5px;
+  color: var(--poke-muted-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.close-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.close-confirm-action {
+  height: 36px;
+  border: 0;
+  color: var(--poke-overlay-text);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.close-confirm-action:focus-visible {
+  outline: 1px solid var(--poke-focus-ring);
+  outline-offset: -3px;
+}
+
+.close-confirm-danger {
+  color: var(--poke-overlay-border);
+}
+
+.close-confirm-danger:hover,
+.close-confirm-cancel:hover {
+  background: var(--poke-tab-hover-bg);
+}
