@@ -1,5 +1,7 @@
 # Poke
 
+<img src="src-tauri/icons/icon.png" alt="Poke icon" width="128" height="128" />
+
 Poke is a desktop terminal for people who run multiple AI agent CLIs and shell sessions in parallel.
 
 Each terminal tab has a character and color. The goal is not decoration for its own sake: the character gives each session a recognizable face, and the color gives the terminal a quick visual identity. Together they make it easier to tell sessions apart, avoid selecting the wrong tab, and keep track of concurrent agent work.
@@ -28,11 +30,11 @@ Download the macOS build from GitHub Releases:
 
 - [Latest release](https://github.com/hayashikentaro/poke/releases/latest)
 
-Unzip the file, then open `Poke.app`.
+Open the DMG, drag `Poke.app` into Applications, then open it. The current build is for Apple Silicon (arm64).
 
 This is an unsigned macOS app. If macOS blocks the first launch, open it from Finder with right click, then `Open`.
 
-Poke is still a prototype. Depending on your macOS Gatekeeper settings, you may need to remove the quarantine attribute after unzipping:
+Poke is still a prototype. Depending on your macOS Gatekeeper settings, you may need to remove the quarantine attribute after installing:
 
 ```sh
 xattr -dr com.apple.quarantine Poke.app
